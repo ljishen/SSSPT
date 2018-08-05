@@ -1,0 +1,6 @@
+---
+ansible_ssh_private_key_file: /home/ljishen/keys/id_rsa
+ansible_user: ljishen
+
+workdir: /tmp/ssspt
+fio_version: 3.8

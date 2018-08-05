@@ -1,0 +1,32 @@
+---
+- name: install fio
+  hosts: all
+  any_errors_fatal: true
+  tasks:
+    - name: install package dependencies for fio
+      become: yes
+      apt:
+        autoclean: yes
+        install_recommends: no
+        name:
+          - libaio-dev
+          - build-essential
+        state: latest
+        update_cache: yes
+    - name: ensure the presence of workdir {{ workdir }}
+      file:
+        path: "{{ workdir }}"
+        state: directory
+    - name: download fio-{{ fio_version }} source code
+      unarchive:
+        creates: "{{ workdir }}/fio-fio-{{ fio_version }}"
+        dest: "{{ workdir }}"
+        remote_src: yes
+        src: https://codeload.github.com/axboe/fio/tar.gz/fio-{{ fio_version }}
+    - name: build fio-{{ fio_version }} from source
+      shell: ./configure && make
+      args:
+        chdir: "{{ workdir }}/fio-fio-{{ fio_version }}"
+        creates: "{{ workdir }}/fio-fio-{{ fio_version }}/fio"
+
+...
