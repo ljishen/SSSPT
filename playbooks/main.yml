@@ -67,6 +67,8 @@
   hosts: all
   vars:
     output_dir: "{{ playbook_dir }}/output"
+    output_format: json+
+    output_file_suffix: json
     pre_conditioning_job_file: pre-conditioning.fio
   pre_tasks:
     - block:

@@ -1,6 +1,8 @@
 ---
 - name: run throughput test
   include_tasks: loop_block_sizes.yml
+  vars:
+    notes: "bs {{ block_size }}"
   with_items:
     - 128kB
     - 1024kB

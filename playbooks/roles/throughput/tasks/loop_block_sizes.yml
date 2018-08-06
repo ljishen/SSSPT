@@ -1,11 +1,8 @@
 ---
-- set_fact:
-    notes: "bs {{ block_size }}"
-
 - include_tasks: tmp_job_files.yml
   vars:
-    io_pattern: write
     included_job_file: wipc.fio
+    io_pattern: write
 
 - name: ({{ notes }}) check and kill remnant pre-conditioning process
   become: yes
@@ -16,16 +13,19 @@
   become: yes
   command: >
     fio-fio-{{ fio_version }}/fio {{ pre_conditioning_job_file }}
-    --output {{ output_dir }}/wipc_{{ block_size }}.txt
+    --output-format={{ output_format }}
+    --output {{ output_dir }}/wipc_{{ block_size }}.{{ output_file_suffix }}
   args:
     chdir: "{{ workdir }}"
 
 - include_tasks: loop_rw_mix.yml
   vars:
     included_job_file: wdpc.fio
+    io_pattern: readwrite
+    notes: "bs {{ block_size }}, %read {{ rwmixread }}"
   with_items:
-    - read
-    - write
+    - 100
+    - 0
   loop_control:
-    loop_var: io_pattern
+    loop_var: rwmixread
 ...

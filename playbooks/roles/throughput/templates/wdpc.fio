@@ -1,0 +1,9 @@
+name=wdpc
+rwmixread={{ rwmixread }}
+
+time_based=1
+
+; run for 1 minute
+runtime=60s
+
+size={{ active_range }}

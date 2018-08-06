@@ -1,3 +1,12 @@
 ---
+- include_tasks: tmp_job_files.yml
 
+- include_tasks: do_until_steady_state.yml
+  vars:
+    notes: "bs {{ block_size }}, %read {{ rwmixread }}, round {{ cur_round }}"
+  with_sequence: count=25
+  loop_control:
+    loop_var: cur_round
+
+- set_fact: steady_state=False
 ...
