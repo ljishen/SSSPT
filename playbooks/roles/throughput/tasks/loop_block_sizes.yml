@@ -1,32 +1,31 @@
 ---
 - set_fact:
+    notes: "bs {{ block_size }}"
+
+- include_tasks: tmp_job_files.yml
+  vars:
     io_pattern: write
     included_job_file: wipc.fio
 
-- name: (bs {{ block_size }}) template the pre-conditioning job file to {{ workdir }}
-  template:
-    backup: no
-    dest: "{{ workdir }}/{{ pre_conditioning_job_file }}"
-    force: yes
-    src: "{{ pre_conditioning_job_file }}"
-
-- name: (bs {{ block_size }}) template the included job file to {{ workdir }}
-  template:
-    backup: no
-    dest: "{{ workdir }}/{{ included_job_file }}"
-    force: yes
-    src: "{{ included_job_file }}"
-
-- name: (bs {{ block_size }}) check and kill remnant pre-conditioning process
+- name: ({{ notes }}) check and kill remnant pre-conditioning process
   become: yes
   shell: pkill -KILL -u "$(id -u)" -f 'fio\s+pre\-conditioning\.fio'
   ignore_errors: yes
 
-- name: (bs {{ block_size }}) run workload independent pre-conditioning on {{ device_node_name }}
+- name: ({{ notes }}) run workload independent pre-conditioning on {{ device_node_name }}
   become: yes
   command: >
     fio-fio-{{ fio_version }}/fio {{ pre_conditioning_job_file }}
     --output {{ output_dir }}/wipc_{{ block_size }}.txt
   args:
     chdir: "{{ workdir }}"
+
+- include_tasks: loop_rw_mix.yml
+  vars:
+    included_job_file: wdpc.fio
+  with_items:
+    - read
+    - write
+  loop_control:
+    loop_var: io_pattern
 ...

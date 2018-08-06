@@ -1,0 +1,15 @@
+---
+- name: ({{ notes }}) template the pre-conditioning job file to {{ workdir }}
+  template:
+    backup: no
+    dest: "{{ workdir }}/{{ pre_conditioning_job_file }}"
+    force: yes
+    src: "{{ pre_conditioning_job_file }}"
+
+- name: ({{ notes }}) template the included job file to {{ workdir }}
+  template:
+    backup: no
+    dest: "{{ workdir }}/{{ included_job_file }}"
+    force: yes
+    src: "{{ included_job_file }}"
+...
