@@ -16,7 +16,7 @@
     dest: "{{ workdir }}/{{ pre_conditioning_job_file }}"
     force: yes
     remote_src: no
-    src: "{{ role_path }}/templates/{{ pre_conditioning_job_file }}"
+    src: "{{ pre_conditioning_job_file }}"
 
 - name: run workload independent pre-conditioning
   become: yes
