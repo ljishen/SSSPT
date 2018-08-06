@@ -1,32 +1,31 @@
 ---
 - set_fact:
     io_pattern: write
-    pre_conditioning_job_file: wipc.fio
+    included_job_file: wipc.fio
 
-- name: (bs {{ block_size }}) template the fio job file to {{ workdir }}
+- name: (bs {{ block_size }}) template the pre-conditioning job file to {{ workdir }}
   template:
-    backup: no
-    dest: "{{ workdir }}/{{ fio_job_file }}"
-    force: yes
-    src: "{{ fio_job_file }}"
-
-- name: (bs {{ block_size }}) copy the pre-conditioning job file to {{ workdir }}
-  copy:
     backup: no
     dest: "{{ workdir }}/{{ pre_conditioning_job_file }}"
     force: yes
-    remote_src: no
     src: "{{ pre_conditioning_job_file }}"
+
+- name: (bs {{ block_size }}) template the included job file to {{ workdir }}
+  template:
+    backup: no
+    dest: "{{ workdir }}/{{ included_job_file }}"
+    force: yes
+    src: "{{ included_job_file }}"
 
 - name: (bs {{ block_size }}) check and kill remnant pre-conditioning process
   become: yes
   shell: pkill -KILL -u "$(id -u)" -f 'fio\s+pre\-conditioning\.fio'
   ignore_errors: yes
 
-- name: (bs {{ block_size }}) run workload independent pre-conditioning on {{ device_name }}
+- name: (bs {{ block_size }}) run workload independent pre-conditioning on {{ device_node_name }}
   become: yes
   command: >
-    fio-fio-{{ fio_version }}/fio {{ fio_job_file }}
+    fio-fio-{{ fio_version }}/fio {{ pre_conditioning_job_file }}
     --output {{ output_dir }}/wipc_{{ block_size }}.txt
   args:
     chdir: "{{ workdir }}"

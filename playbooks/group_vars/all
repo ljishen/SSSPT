@@ -13,3 +13,8 @@ write_caching: 1
 # usually means O_DIRECT.
 # See http://fio.readthedocs.io/en/latest/fio_doc.html#cmdoption-arg-direct
 direct_io: 1
+
+# This option corresponds to the concept of Active Range in the PTS.
+# Usually set 100% for Enterprise Performance Test Specification (PTS-E),
+# and 75% for Client Performance Test Specification (PTS-C).
+active_range: 75%
