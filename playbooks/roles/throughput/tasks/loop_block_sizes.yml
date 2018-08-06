@@ -18,6 +18,11 @@
     remote_src: no
     src: "{{ pre_conditioning_job_file }}"
 
+- name: (bs {{ block_size }}) check and kill remnant pre-conditioning process
+  become: yes
+  shell: pkill -KILL -u "$(id -u)" -f 'fio\s+pre\-conditioning\.fio'
+  ignore_errors: yes
+
 - name: (bs {{ block_size }}) run workload independent pre-conditioning on {{ device_name }}
   become: yes
   command: >

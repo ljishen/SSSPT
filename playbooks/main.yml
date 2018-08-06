@@ -66,6 +66,7 @@
   hosts: all
   vars:
     output_dir: "{{ playbook_dir }}/output"
+    fio_job_file: pre-conditioning.fio
   pre_tasks:
     - block:
       - name: ensure the presence of output dir {{ output_dir }}
@@ -82,7 +83,6 @@
       vars:
         thread_count: 1
         queue_depth: 32
-        fio_job_file: test.fio
       tags: [ 'never', 'throughput' ]
       when: test_device
 ...
