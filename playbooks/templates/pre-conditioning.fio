@@ -1,5 +1,5 @@
 [pc]
-direct={{ 1 - write_caching }}
+direct={{ direct_io }}
 filename={{ device_name }}
 rw={{ io_pattern }}
 bs={{ block_size }}

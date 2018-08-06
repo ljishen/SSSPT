@@ -5,5 +5,11 @@ ansible_user: ljishen
 workdir: /tmp/ssspt
 fio_version: 3.8
 
-# Options corresponding to WCD (0) and WCE (1) in the PTS
-write_caching: 0
+# This option corresponds to WCD (0) for Enterprise SSDs and
+# WCE (1) for Client SSDs in the PTS.
+write_caching: 1
+
+# This option sets whether to use non-buffered I/O, which
+# usually means O_DIRECT.
+# See http://fio.readthedocs.io/en/latest/fio_doc.html#cmdoption-arg-direct
+direct_io: 1
