@@ -1,0 +1,26 @@
+---
+- set_fact:
+    io_pattern: write
+    pre_conditioning_job_file: wipc.fio
+
+- name: template the fio job file to dest
+  template:
+    backup: no
+    dest: "{{ workdir }}/{{ fio_job_file }}"
+    force: yes
+    src: "{{ fio_job_file }}"
+
+- name: copy the pre-conditioning job file to desc
+  copy:
+    backup: no
+    dest: "{{ workdir }}/{{ pre_conditioning_job_file }}"
+    force: yes
+    remote_src: no
+    src: "{{ role_path }}/templates/{{ pre_conditioning_job_file }}"
+
+- name: run workload independent pre-conditioning
+  become: yes
+  command: "fio-fio-{{ fio_version }}/fio {{ fio_job_file }} --output {{ output_dir }}/wipc_report.txt"
+  args:
+    chdir: "{{ workdir }}"
+...

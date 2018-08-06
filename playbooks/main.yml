@@ -1,32 +1,75 @@
 ---
+- hosts: all
+  any_errors_fatal: true
+  vars:
+    yes_or_no: ["yes", "y", "no", "n"]
+  tasks:
+    # vars_prompt does not expand variables defined in inventory. (ansible 2.6.2)
+    # https://github.com/ansible/ansible/issues/32723 (ossible related issue)
+    - pause:
+        prompt: >
+          Are you sure you want to run performance test for
+          {{ device_name }} on {{ inventory_hostname }} (yes/no)?
+        echo: yes
+      register: test_device_res
+    - debug:
+        msg: Please only enter yes (y) or no (n).
+      when: test_device_res.user_input not in yes_or_no
+      failed_when: test_device_res.user_input not in yes_or_no
+    - set_fact:
+        test_device: "{{ test_device_res.user_input in yes_or_no[0:2] }}"
+
 - name: install fio
   hosts: all
   any_errors_fatal: true
   tasks:
-    - name: install package dependencies for fio
-      become: yes
-      apt:
-        autoclean: yes
-        install_recommends: no
-        name:
-          - libaio-dev
-          - build-essential
-        state: latest
-        update_cache: yes
-    - name: ensure the presence of workdir {{ workdir }}
-      file:
-        path: "{{ workdir }}"
-        state: directory
-    - name: download fio-{{ fio_version }} source code
-      unarchive:
-        creates: "{{ workdir }}/fio-fio-{{ fio_version }}"
-        dest: "{{ workdir }}"
-        remote_src: yes
-        src: https://codeload.github.com/axboe/fio/tar.gz/fio-{{ fio_version }}
-    - name: build fio-{{ fio_version }} from source
-      shell: ./configure && make
-      args:
-        chdir: "{{ workdir }}/fio-fio-{{ fio_version }}"
-        creates: "{{ workdir }}/fio-fio-{{ fio_version }}/fio"
+    - block:
+      - name: install package dependencies
+        become: yes
+        apt:
+          autoclean: yes
+          install_recommends: no
+          name:
+            - libaio-dev
+            - build-essential
+            - hdparm
+          state: latest
+          update_cache: yes
+      - name: ensure the presence of workdir {{ workdir }}
+        file:
+          path: "{{ workdir }}"
+          state: directory
+      - name: download fio-{{ fio_version }} source code
+        unarchive:
+          creates: "{{ workdir }}/fio-fio-{{ fio_version }}"
+          dest: "{{ workdir }}"
+          remote_src: yes
+          src: https://codeload.github.com/axboe/fio/tar.gz/fio-{{ fio_version }}
+      - name: build fio-{{ fio_version }} from source
+        shell: ./configure && make
+        args:
+          chdir: "{{ workdir }}/fio-fio-{{ fio_version }}"
+          creates: "{{ workdir }}/fio-fio-{{ fio_version }}/fio"
+      when: test_device
 
+- name: run performance test
+  hosts: all
+  vars:
+    output_dir: "{{ playbook_dir }}/output"
+  pre_tasks:
+    - block:
+      - name: ensure the presence of output dir {{ output_dir }}
+        file:
+          path: "{{ output_dir }}"
+          state: directory
+      - name: update write caching
+        become: yes
+        command: hdparm -W{{ write_caching }} {{ device_name }}
+      when: test_device
+  roles:
+    - role: throughput
+      thread_count: 1
+      queue_depth: 32
+      fio_job_file: test.fio
+      when: test_device
 ...

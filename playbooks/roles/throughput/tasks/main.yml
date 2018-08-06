@@ -1,0 +1,9 @@
+---
+- name: run throughput test
+  include_tasks: loop_block_sizes.yml
+  with_items:
+    - 128kB
+    - 1024kB
+  loop_control:
+    loop_var: block_size
+...

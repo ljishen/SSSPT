@@ -4,3 +4,6 @@ ansible_user: ljishen
 
 workdir: /tmp/ssspt
 fio_version: 3.8
+
+# Options corresponding to WCD (0) and WCE (1) in the PTS
+write_caching: 0

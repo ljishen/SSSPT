@@ -1,0 +1,11 @@
+[global]
+direct={{ 1 - write_caching }}
+filename={{ device_name }}
+rw={{ io_pattern }}
+bs={{ block_size }}
+numjobs={{ thread_count }}
+
+[file1]
+ioengine=libaio
+iodepth={{ queue_depth }}
+include {{ pre_conditioning_job_file }}
