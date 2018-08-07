@@ -11,7 +11,7 @@
       chdir: "{{ workdir }}"
 
   - name: ({{ notes }}) get throughput in kbytes
-    shell: cat {{ output_file }} | {{ workdir }}/jq '{{ job_key_path }}.bw'
+    shell: cat {{ output_file }} | {{ workdir }}/jq '{{ job_key_path }}.bw_mean'
     register: comm_res
 
   - name: ({{ notes }}) save throughput for steady state detection

@@ -12,9 +12,9 @@
 - name: ({{ notes }}) run workload independent pre-conditioning on {{ device_node_name }}
   become: yes
   command: >
-    {{ fio_dir }}/fio {{ pre_conditioning_job_file }}
+    {{ fio_dir }}/fio {{ pre_conditioning_job_filename }}
     --output-format={{ output_format }}
-    --output {{ output_dir }}/wipc_{{ block_size }}.{{ output_file_suffix }}
+    --output {{ output_dir }}/wipc_bs{{ block_size }}.{{ output_file_suffix }}
   args:
     chdir: "{{ workdir }}"
 

@@ -33,8 +33,6 @@
   hosts: all
   any_errors_fatal: true
   tags: [ 'always' ]
-  vars:
-    fio_dir: "{{ workdir }}/fio-fio-{{ fio_version }}"
   tasks:
     - block:
       - name: install dependent apt packages
@@ -59,6 +57,8 @@
         file:
           path: "{{ workdir }}"
           state: directory
+      - set_fact:
+          fio_dir: "{{ workdir }}/fio-fio-{{ fio_version }}"
       - name: download fio-{{ fio_version }} source code
         unarchive:
           creates: "{{ fio_dir }}"
@@ -75,7 +75,7 @@
 - name: run performance test
   hosts: all
   vars:
-    output_dir: "{{ playbook_dir }}/output"
+    output_dir: "{{ inventory_dir }}/output"
     output_format: json+
     output_file_suffix: json
     pre_conditioning_job_filename: pre-conditioning.fio
