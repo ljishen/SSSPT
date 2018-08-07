@@ -11,13 +11,13 @@
       chdir: "{{ workdir }}"
 
   - name: ({{ notes }}) get throughput in kbytes
-    shell: cat {{ output_file }} | {{ workdir }}/jq '{{ json_key_path }}.bw'
+    shell: cat {{ output_file }} | {{ workdir }}/jq '{{ job_key_path }}.bw'
     register: comm_res
 
   - name: ({{ notes }}) save throughput for steady state detection
     set_fact:
       # convert from KB/s to MB/s before adding to the list
-      throughputs_in_windows: "{{ throughputs_in_windows.append(comm_res.stdout | int / 1024)[0,4] }}"
+      throughputs_in_windows: "{{ throughputs_in_windows.append(comm_res.stdout | int / 1024)[:4] }}"
 
   - name: ({{ notes }}) check steady state
     command: verify_ss.py {{ throughputs_in_windows }}
@@ -28,7 +28,7 @@
       steady_state: "{{ True if comm_res.rc == 0 else False }}"
 
   - name: ({{ notes }}) get total performed IO in bytes
-    shell: cat {{ output_file }} | {{ workdir }}/jq '{{ json_key_path }}.io_bytes'
+    shell: cat {{ output_file }} | {{ workdir }}/jq '{{ job_key_path }}.io_bytes'
     register: comm_res
     when: not steady_state
 
@@ -38,7 +38,7 @@
         {%- set offset = io_offset | default(0) + comm_res.stdout | int  -%}
         {%- set end_of_range = device_size * active_range / 100 | int - 1 -%}
         {%- if offset > end_of_range -%}
-          {%- set offset = offset - end_of_range -%}
+          {%- set offset = offset - end_of_range - 1 -%}
         {%- endif -%}
         {{ offset }}
     when: not steady_state

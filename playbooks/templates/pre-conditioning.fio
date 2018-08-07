@@ -1,9 +1,10 @@
 [pc]
-direct={{ direct_io }}
 filename={{ device_node_name }}
+direct={{ direct_io }}
 rw={{ io_pattern }}
 bs={{ block_size }}
 numjobs={{ thread_count }}
 ioengine=libaio
 iodepth={{ queue_depth }}
+size={{ active_range }}%
 include {{ included_job_filename }}

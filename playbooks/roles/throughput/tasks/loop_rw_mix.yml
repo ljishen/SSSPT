@@ -2,7 +2,7 @@
 - include_tasks: tmp_job_files.yml
 
 - set_fact:
-    json_key_path: .jobs.{{ 'read' if rwmixread == 100 else 'write' }}
+    job_key_path: .jobs.{{ 'read' if rwmixread == 100 else 'write' }}
     throughputs_in_windows: []  # the item value is in the unit of MB/s
     steady_state: False
 

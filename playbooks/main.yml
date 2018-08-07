@@ -27,7 +27,7 @@
       when: test_device_res.user_input not in yes_or_no
       failed_when: test_device_res.user_input not in yes_or_no
     - set_fact:
-        test_device: "{{ test_device_res.user_input in yes_or_no[0:2] }}"
+        test_device: "{{ test_device_res.user_input in yes_or_no[:2] }}"
 
 - name: install required programs
   hosts: all
