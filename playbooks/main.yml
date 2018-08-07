@@ -44,8 +44,14 @@
             - libaio-dev
             - build-essential
             - hdparm
+            - python3-numpy
           state: present
           update_cache: yes
+      - name: install jq for parsing JSON data
+        get_url:
+          dest: "{{ workdir }}"
+          url: https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
+          mode: +x
       - name: ensure the presence of workdir {{ workdir }}
         file:
           path: "{{ workdir }}"
@@ -79,6 +85,12 @@
       - name: update write caching
         become: yes
         command: hdparm -W{{ write_caching }} {{ device_node_name }}
+      - name: get size of {{ device_node_name }} in bytes
+        become: yes
+        command: blockdev --getsize64 {{ device_node_name }}
+        register: comm_res
+      - set_fact:
+          device_size: "{{ comm_res.stdout | int }}"
       tags: [ 'always' ]
       when: test_device
   roles:

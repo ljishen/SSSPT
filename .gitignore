@@ -5,3 +5,5 @@
 
 output
 tmp
+
+.mypy_cache/

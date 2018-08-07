@@ -1,7 +1,7 @@
 name=wipc
-size={{ active_range }}
+size={{ active_range }}%
 
 ; io_size can only be integer
-io_size={{ ansible_devices[device_name]['size'].split(' ')[0] | int }}GB
+io_size={{ device_size }}B
 
 loops=2

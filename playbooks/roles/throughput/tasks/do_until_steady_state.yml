@@ -1,3 +1,49 @@
 ---
+- block:
+  vars:
+    output_file: "{{ output_dir }}/wdpc_bs{{ block_size }}_read{{ rwmixread }}_round{{ cur_round }}.{{ output_file_suffix }}"
 
+  - name: ({{ notes }}) run workload dependent pre-conditioning on {{ device_node_name }}
+    become: yes
+    command: >
+      fio-fio-{{ fio_version }}/fio {{ pre_conditioning_job_file }} --offset={{ io_offset | default(0) }}
+      --output-format={{ output_format }}
+      --output {{ output_file }}
+    args:
+      chdir: "{{ workdir }}"
+
+  - name: ({{ notes }}) get throughput in kbytes
+    shell: cat {{ output_file }} | {{ workdir }}/jq '{{ json_key_path }}.bw'
+    register: comm_res
+
+  - name: ({{ notes }}) save throughput for steady state detection
+    set_fact:
+      # convert from KB/s to MB/s before adding to the list
+      throughputs_in_windows: "{{ throughputs_in_windows.append(comm_res.stdout | int / 1024)[0,4] }}"
+
+  - name: ({{ notes }}) check steady state
+    command: verify_ss.py {{ throughputs_in_windows }}
+    register: comm_res
+
+  - name: ({{ notes }}) update loop condition
+    set_fact:
+      steady_state: "{{ True if comm_res.rc == 0 else False }}"
+
+  - name: ({{ notes }}) get total performed IO in bytes
+    shell: cat {{ output_file }} | {{ workdir }}/jq '{{ json_key_path }}.io_bytes'
+    register: comm_res
+    when: not steady_state
+
+  - name: ({{ notes }}) update offset for next round
+    set_fact:
+      io_offset: >
+        {%- set offset = io_offset | default(0) + comm_res.stdout | int  -%}
+        {%- set end_of_range = device_size * active_range / 100 | int - 1 -%}
+        {%- if offset > end_of_range -%}
+          {%- set offset = offset - end_of_range -%}
+        {%- endif -%}
+        {{ offset }}
+    when: not steady_state
+
+  when: not steady_state
 ...
