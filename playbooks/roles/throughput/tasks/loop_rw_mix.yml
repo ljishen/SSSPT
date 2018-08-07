@@ -1,16 +1,20 @@
 ---
+- include_tasks: tmp_job_files.yml
+
 - set_fact:
     json_key_path: .jobs.{{ 'read' if rwmixread == 100 else 'write' }}
     throughputs_in_windows: []  # the item value is in the unit of MB/s
-
-- include_tasks: tmp_job_files.yml
+    steady_state: False
 
 - include_tasks: do_until_steady_state.yml
   vars:
     notes: "bs {{ block_size }}, %read {{ rwmixread }}, round {{ cur_round }}"
+    output_file: "{{ output_dir }}/wdpc_bs{{ block_size }}_read{{ rwmixread }}_round{{ cur_round }}.{{ output_file_suffix }}"
   with_sequence: count=25
   loop_control:
     loop_var: cur_round
 
-- set_fact: steady_state=False
+- name: ({{ notes }}) print final steady state
+  debug:
+    var: steady_state
 ...

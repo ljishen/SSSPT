@@ -29,13 +29,15 @@
     - set_fact:
         test_device: "{{ test_device_res.user_input in yes_or_no[0:2] }}"
 
-- name: install fio
+- name: install required programs
   hosts: all
   any_errors_fatal: true
   tags: [ 'always' ]
+  vars:
+    fio_dir: "{{ workdir }}/fio-fio-{{ fio_version }}"
   tasks:
     - block:
-      - name: install package dependencies
+      - name: install dependent apt packages
         become: yes
         apt:
           autoclean: yes
@@ -49,7 +51,8 @@
           update_cache: yes
       - name: install jq for parsing JSON data
         get_url:
-          dest: "{{ workdir }}"
+          dest: "{{ workdir }}/jq"
+          force: no
           url: https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
           mode: +x
       - name: ensure the presence of workdir {{ workdir }}
@@ -58,15 +61,15 @@
           state: directory
       - name: download fio-{{ fio_version }} source code
         unarchive:
-          creates: "{{ workdir }}/fio-fio-{{ fio_version }}"
+          creates: "{{ fio_dir }}"
           dest: "{{ workdir }}"
           remote_src: yes
           src: https://codeload.github.com/axboe/fio/tar.gz/fio-{{ fio_version }}
       - name: build fio-{{ fio_version }} from source
         shell: ./configure && make
         args:
-          chdir: "{{ workdir }}/fio-fio-{{ fio_version }}"
-          creates: "{{ workdir }}/fio-fio-{{ fio_version }}/fio"
+          chdir: "{{ fio_dir }}"
+          creates: "{{ fio_dir }}/fio"
       when: test_device
 
 - name: run performance test
@@ -75,7 +78,7 @@
     output_dir: "{{ playbook_dir }}/output"
     output_format: json+
     output_file_suffix: json
-    pre_conditioning_job_file: pre-conditioning.fio
+    pre_conditioning_job_filename: pre-conditioning.fio
   pre_tasks:
     - block:
       - name: ensure the presence of output dir {{ output_dir }}

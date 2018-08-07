@@ -1,7 +1,4 @@
 name=wipc
 size={{ active_range }}%
-
-; io_size can only be integer
 io_size={{ device_size }}B
-
 loops=2

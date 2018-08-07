@@ -1,12 +1,10 @@
 ---
 - block:
-  vars:
-    output_file: "{{ output_dir }}/wdpc_bs{{ block_size }}_read{{ rwmixread }}_round{{ cur_round }}.{{ output_file_suffix }}"
 
   - name: ({{ notes }}) run workload dependent pre-conditioning on {{ device_node_name }}
     become: yes
     command: >
-      fio-fio-{{ fio_version }}/fio {{ pre_conditioning_job_file }} --offset={{ io_offset | default(0) }}
+      {{ fio_dir }}/fio {{ pre_conditioning_job_filename }} --offset={{ io_offset | default(0) }}
       --output-format={{ output_format }}
       --output {{ output_file }}
     args:
