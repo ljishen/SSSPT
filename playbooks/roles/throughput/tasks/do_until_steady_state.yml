@@ -14,13 +14,21 @@
     shell: cat {{ output_file }} | {{ workdir }}/jq '{{ job_key_path }}.bw_mean'
     register: comm_res
 
+  - debug:
+      msg: throughput {{ comm_res.stdout }}KB/s
+      verbosity: "{{ verbosity }}"
+
   - name: ({{ notes }}) save throughput for steady state detection
     set_fact:
       # convert from KB/s to MB/s before adding to the list
-      throughputs_in_windows: "{{ throughputs_in_windows.append(comm_res.stdout | int / 1024)[:4] }}"
+      throughputs_in_window: "{{ throughputs_in_window.append(comm_res.stdout | int / 1024)[:4] }}"
+
+  - debug:
+      msg: current throughput numbers in window {{ throughputs_in_window }}
+      verbosity: "{{ verbosity }}"
 
   - name: ({{ notes }}) check steady state
-    command: verify_ss.py {{ throughputs_in_windows }}
+    command: verify_ss.py {{ throughputs_in_window }}
     register: comm_res
 
   - name: ({{ notes }}) update loop condition
@@ -31,6 +39,10 @@
     shell: cat {{ output_file }} | {{ workdir }}/jq '{{ job_key_path }}.io_bytes'
     register: comm_res
     when: not steady_state
+
+  - debug:
+      msg: total IO performed {{ comm_res.stdout }}B
+      verbosity: "{{ verbosity }}"
 
   - name: ({{ notes }}) update offset for next round
     set_fact:
