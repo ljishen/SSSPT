@@ -6,7 +6,7 @@
 
 - name: ({{ notes }}) check and kill remnant pre-conditioning process
   become: yes
-  shell: pkill -KILL -u "$(id -u)" -f 'fio\s+pre\-conditioning\.fio'
+  shell: pkill -KILL -u "$(id -u)" -f 'fio\s+{{ pre_conditioning_job_filename }}'
   ignore_errors: yes
 
 - name: ({{ notes }}) backup old output file
