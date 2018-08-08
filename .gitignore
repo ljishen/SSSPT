@@ -3,7 +3,7 @@
 # Jupyter Notebook
 .ipynb_checkpoints
 
-output
+output_*
 tmp
 
 .mypy_cache/

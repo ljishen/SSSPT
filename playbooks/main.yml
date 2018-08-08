@@ -3,104 +3,90 @@
   any_errors_fatal: true
   tags: [ 'always' ]
   vars:
-    yes_or_no: ["yes", "y", "no", "n"]
-    perf_test_available_tags: [ 'throughput' ]
-    perf_test_run_tags: "{{ ansible_run_tags | intersect(perf_test_available_tags) }}"
+    yeses: ["yes", "y"]
   tasks:
-    - debug:
-        msg: "Please specify at least one of performance run tags: {{ perf_test_available_tags }}"
-      when: perf_test_run_tags | length == 0
-      failed_when: perf_test_run_tags | length == 0
     - set_fact:
         device_node_name: "/dev/{{ device_name }}"
     # vars_prompt does not expand variables defined in inventory. (ansible 2.6.2)
-    # https://github.com/ansible/ansible/issues/32723 (ossible related issue)
+    # https://github.com/ansible/ansible/issues/32723 (possible related issue)
     - pause:
         prompt: >
-          Are you sure you want to run performance test
-          {{ perf_test_run_tags }}
+          Are you sure you want to run performance tests
           for {{ device_node_name }} on {{ inventory_hostname }} (yes/no)?
         echo: yes
       register: test_device_res
-    - debug:
-        msg: Please enter either yes (y) or no (n).
-      when: test_device_res.user_input not in yes_or_no
-      failed_when: test_device_res.user_input not in yes_or_no
-    - set_fact:
-        test_device: "{{ test_device_res.user_input in yes_or_no[:2] }}"
+      failed_when: test_device_res.user_input not in yeses
 
 - name: install required programs
   hosts: all
   any_errors_fatal: true
   tags: [ 'always' ]
   tasks:
-    - block:
-      - name: install dependent apt packages
-        become: yes
-        apt:
-          autoclean: yes
-          install_recommends: no
-          name:
-            - libaio-dev
-            - build-essential
-            - hdparm
-            - python3-numpy
-          state: present
-          update_cache: yes
-      - name: install jq for parsing JSON data
-        get_url:
-          dest: "{{ workdir }}/jq"
-          force: no
-          url: https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
-          mode: +x
-      - name: ensure the presence of workdir {{ workdir }}
-        file:
-          path: "{{ workdir }}"
-          state: directory
-      - set_fact:
-          fio_dir: "{{ workdir }}/fio-fio-{{ fio_version }}"
-      - name: download fio-{{ fio_version }} source code
-        unarchive:
-          creates: "{{ fio_dir }}"
-          dest: "{{ workdir }}"
-          remote_src: yes
-          src: https://codeload.github.com/axboe/fio/tar.gz/fio-{{ fio_version }}
-      - name: build fio-{{ fio_version }} from source
-        shell: ./configure && make
-        args:
-          chdir: "{{ fio_dir }}"
-          creates: "{{ fio_dir }}/fio"
-      when: test_device
+    - name: install dependent apt packages
+      become: yes
+      apt:
+        autoclean: yes
+        install_recommends: no
+        name:
+          - libaio-dev
+          - build-essential
+          - hdparm
+          - python3-numpy
+        state: present
+        update_cache: yes
+    - name: install jq for parsing JSON data
+      get_url:
+        dest: "{{ workdir }}/jq"
+        force: no
+        url: https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
+        mode: +x
+    - name: ensure the presence of workdir {{ workdir }}
+      file:
+        path: "{{ workdir }}"
+        state: directory
+    - set_fact:
+        fio_dir: "{{ workdir }}/fio-fio-{{ fio_version }}"
+    - name: download fio-{{ fio_version }} source code
+      unarchive:
+        creates: "{{ fio_dir }}"
+        dest: "{{ workdir }}"
+        remote_src: yes
+        src: https://codeload.github.com/axboe/fio/tar.gz/fio-{{ fio_version }}
+    - name: build fio-{{ fio_version }} from source
+      shell: ./configure && make
+      args:
+        chdir: "{{ fio_dir }}"
+        creates: "{{ fio_dir }}/fio"
 
 - name: run performance test
   hosts: all
+  tags: [ 'always' ]
   vars:
-    output_dir: "{{ inventory_dir }}/analysis/output"
+    output_dir: "{{ inventory_dir }}/analysis/output_{{ role_path | basename }}"
     output_format: json+
     output_file_suffix: json
     pre_conditioning_job_filename: pre-conditioning.fio
   pre_tasks:
-    - block:
-      - name: ensure the presence of output dir {{ output_dir }}
-        file:
-          path: "{{ output_dir }}"
-          state: directory
-      - name: update write caching
-        become: yes
-        command: hdparm -W{{ write_caching }} {{ device_node_name }}
-      - name: get size of {{ device_node_name }} in bytes
-        become: yes
-        command: blockdev --getsize64 {{ device_node_name }}
-        register: comm_res
-      - set_fact:
-          device_size: "{{ comm_res.stdout }}"
-      tags: [ 'always' ]
-      when: test_device
+    - set_fact:
+        run_perf_tests: "{{ ansible_run_tags | intersect(role_names) }}"
+    - debug:
+        msg: Please specify at least one of performance tests {{ role_names }} using '--tags'
+      when: run_perf_tests | length == 0
+      failed_when: run_perf_tests | length == 0
+
+    - name: update write caching
+      become: yes
+      command: hdparm -W{{ write_caching }} {{ device_node_name }}
+    - name: get size of {{ device_node_name }} in bytes
+      become: yes
+      command: blockdev --getsize64 {{ device_node_name }}
+      register: comm_res
+    - set_fact:
+        device_size: "{{ comm_res.stdout }}"
   roles:
     - role: throughput
       vars:
         thread_count: 1
         queue_depth: 32
-      tags: [ 'never', 'throughput' ]
-      when: test_device
+      when: role_path | basename in run_perf_tests
 ...
