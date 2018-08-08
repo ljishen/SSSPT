@@ -15,7 +15,7 @@ variable (y) being tracked:
        y-values within the Measurement Window, is within 10% of Ave(y) value
        within the Measurement Window.
 
-Note that the length of measurement window is 4 according to the specific
+Note that the length of measurement window is 5 according to the specific
 performance test in the PTS (e.g. Throughput Test on page 37).
 
 

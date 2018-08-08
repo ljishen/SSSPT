@@ -26,4 +26,4 @@ direct_io: 1
 active_range: 75
 
 # Use the latest x number of values to detect steady state.
-measurement_window_size: 4
+measurement_window_size: 5
