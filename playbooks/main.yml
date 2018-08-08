@@ -75,7 +75,7 @@
 - name: run performance test
   hosts: all
   vars:
-    output_dir: "{{ inventory_dir }}/output"
+    output_dir: "{{ inventory_dir }}/analysis/output"
     output_format: json+
     output_file_suffix: json
     pre_conditioning_job_filename: pre-conditioning.fio
