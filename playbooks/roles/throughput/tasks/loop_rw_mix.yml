@@ -3,7 +3,6 @@
 
 - set_fact:
     job_key_path: .jobs[0].{{ 'read' if rwmixread == 100 else 'write' }}
-    throughputs_in_window: []  # the item value is in the unit of MB/s
     steady_state: False
 
 - include_tasks: do_until_steady_state.yml

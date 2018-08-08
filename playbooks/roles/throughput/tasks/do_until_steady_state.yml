@@ -21,14 +21,15 @@
   - name: ({{ notes }}) save throughput for steady state detection
     set_fact:
       # convert from KB/s to MB/s before adding to the list
-      throughputs_in_window: "{{ throughputs_in_window.append(comm_res.stdout | int / 1024)[:4] }}"
+      throughputs_values: >
+        {{ throughputs_values | default([]) + [ comm_res.stdout | float / 1024 ] }}
 
   - debug:
-      msg: "current throughput numbers in window: {{ throughputs_in_window }}"
+      msg: "current throughput values: {{ throughputs_values }}"
       verbosity: "{{ verbosity }}"
 
   - name: ({{ notes }}) check steady state
-    command: verify_ss.py {{ throughputs_in_window }}
+    command: verify_ss.py '{{ throughputs_values }}' {{ measurement_window_size }}
     register: comm_res
 
   - name: ({{ notes }}) update loop condition
@@ -47,12 +48,12 @@
   - name: ({{ notes }}) update offset for next round
     set_fact:
       io_offset: >
-        {%- set offset_num = float(io_offset | default(0)) + float(comm_res.stdout) -%}
-        {%- set end_of_range = float(device_size) * active_range / 100 - 1 -%}
-        {%- if offset_num > end_of_range -%}
-          {%- set offset_num = offset_num - end_of_range - 1 -%}
-        {%- endif -%}
-        {{ offset_num | int }}
+        {% set offset_num = int(io_offset) + int(comm_res.stdout) -%}
+        {% set size_of_range = int(int(device_size) * active_range / 100) -%}
+        {% if offset_num >= size_of_range -%}
+          {% set offset_num = offset_num - size_of_range -%}
+        {% endif -%}
+        {{ offset_num }}
     when: not steady_state
 
   when: not steady_state

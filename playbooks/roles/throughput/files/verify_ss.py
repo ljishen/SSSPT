@@ -18,14 +18,19 @@ variable (y) being tracked:
 Note that the length of measurement window is 4 according to the specific
 performance test in the PTS (e.g. Throughput Test on page 37).
 
+
+Usage:
+    verify_ss.py LIST WINDOW_SIZE
+
+LIST        the values in list
+WINDOW_SIZE the number of latest values in LIST used for steady state detection
+
 """
 
 import sys
 import ast
 
 import numpy as np
-
-WINDOWN_LEN = 4
 
 
 def main():
@@ -36,19 +41,26 @@ def main():
         0: Satisfy the criteria of steady state.
 
     """
-    throughputs = ast.literal_eval(sys.argv[1])
+    values = ast.literal_eval(sys.argv[1])
+    measurement_window_size = int(sys.argv[2])
 
-    if len(throughputs) < WINDOWN_LEN:
-        print('Minimum number of input values is', WINDOWN_LEN)
+    if len(values) < measurement_window_size:
+        print('The minimum number of input values is', measurement_window_size)
         exit(1)
 
-    avg_val = np.mean(throughputs)
-    if max(throughputs) - min(throughputs) > avg_val * 0.2:
+    values_in_window = values[-1 * measurement_window_size:]
+    print("values in window:", values_in_window)
+
+    avg_val = np.mean(values_in_window)
+    if max(values_in_window) - min(values_in_window) > avg_val * 0.2:
         exit(1)
 
-    coefficients = np.polyfit(range(WINDOWN_LEN), throughputs, 1)
+    coefficients = np.polyfit(
+        range(measurement_window_size),
+        values_in_window,
+        1)
     poly = np.poly1d(coefficients)
-    if abs(poly(0) - poly(4)) > avg_val * 0.1:
+    if abs(poly(0) - poly(measurement_window_size - 1)) > avg_val * 0.1:
         exit(1)
 
     exit(0)

@@ -24,3 +24,6 @@ direct_io: 1
 # Usually set 100% for Enterprise Performance Test Specification (PTS-E),
 # and 75% for Client Performance Test Specification (PTS-C).
 active_range: 75
+
+# Use the latest x number of values to detect steady state.
+measurement_window_size: 4

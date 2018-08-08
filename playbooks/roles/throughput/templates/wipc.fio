@@ -1,5 +1,2 @@
 name=wipc
-
-# io_size can only accept value of int
-# http://fio.readthedocs.io/en/latest/fio_man.html#cmdoption-arg-io-size
-io_size={{ (device_size | float / 1024 / 1024 * 2) | int }}MB
+io_size={{ device_size | int * 2 }}B
