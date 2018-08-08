@@ -25,12 +25,14 @@
         {{ throughputs_values | default([]) + [ comm_res.stdout | float / 1024 ] }}
 
   - debug:
-      msg: "current throughput values: {{ throughputs_values }}"
+      msg: "current throughput values (MB/s): {{ throughputs_values }}"
       verbosity: "{{ verbosity }}"
 
   - name: ({{ notes }}) check steady state
-    command: verify_ss.py '{{ throughputs_values }}' {{ measurement_window_size }}
+    command: >
+      {{ role_path }}/files/verify_ss.py '{{ throughputs_values }}' {{ measurement_window_size }}
     register: comm_res
+    ignore_errors: yes
 
   - name: ({{ notes }}) update loop condition
     set_fact:
@@ -48,8 +50,8 @@
   - name: ({{ notes }}) update offset for next round
     set_fact:
       io_offset: >
-        {% set offset_num = int(io_offset) + int(comm_res.stdout) -%}
-        {% set size_of_range = int(int(device_size) * active_range / 100) -%}
+        {% set offset_num = io_offset | default(0) | int + comm_res.stdout | int -%}
+        {% set size_of_range = (device_size | int * active_range / 100) | int -%}
         {% if offset_num >= size_of_range -%}
           {% set offset_num = offset_num - size_of_range -%}
         {% endif -%}

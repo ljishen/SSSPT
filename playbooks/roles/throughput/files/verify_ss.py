@@ -45,7 +45,8 @@ def main():
     measurement_window_size = int(sys.argv[2])
 
     if len(values) < measurement_window_size:
-        print('The minimum number of input values is', measurement_window_size)
+        print('Not enough input values (< %d): %s'
+              % (measurement_window_size, values))
         exit(1)
 
     values_in_window = values[-1 * measurement_window_size:]
