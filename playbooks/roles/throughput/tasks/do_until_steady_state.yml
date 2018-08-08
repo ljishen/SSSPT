@@ -1,6 +1,13 @@
 ---
 - block:
 
+  - name: ({{ notes }}) backup old output file
+    copy:
+      backup: yes
+      content: ""
+      dest: "{{ output_file }}"
+      force: yes
+
   - name: ({{ notes }}) run workload dependent pre-conditioning on {{ device_node_name }}
     become: yes
     command: >

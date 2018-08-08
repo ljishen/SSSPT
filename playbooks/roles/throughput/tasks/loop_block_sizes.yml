@@ -9,12 +9,19 @@
   shell: pkill -KILL -u "$(id -u)" -f 'fio\s+pre\-conditioning\.fio'
   ignore_errors: yes
 
+- name: ({{ notes }}) backup old output file
+  copy:
+    backup: yes
+    content: ""
+    dest: "{{ output_file }}"
+    force: yes
+
 - name: ({{ notes }}) run workload independent pre-conditioning on {{ device_node_name }}
   become: yes
   command: >
     {{ fio_dir }}/fio {{ pre_conditioning_job_filename }}
     --output-format={{ output_format }}
-    --output {{ output_dir }}/wipc_bs{{ block_size }}.{{ output_file_suffix }}
+    --output {{ output_file }}
   args:
     chdir: "{{ workdir }}"
 
