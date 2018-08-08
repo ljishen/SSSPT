@@ -15,7 +15,7 @@
     register: comm_res
 
   - debug:
-      msg: throughput {{ comm_res.stdout }}KB/s
+      msg: "throughput: {{ comm_res.stdout }} KB/s"
       verbosity: "{{ verbosity }}"
 
   - name: ({{ notes }}) save throughput for steady state detection
@@ -24,7 +24,7 @@
       throughputs_in_window: "{{ throughputs_in_window.append(comm_res.stdout | int / 1024)[:4] }}"
 
   - debug:
-      msg: current throughput numbers in window {{ throughputs_in_window }}
+      msg: "current throughput numbers in window: {{ throughputs_in_window }}"
       verbosity: "{{ verbosity }}"
 
   - name: ({{ notes }}) check steady state
@@ -41,18 +41,18 @@
     when: not steady_state
 
   - debug:
-      msg: total IO performed {{ comm_res.stdout }}B
+      msg: "total IO performed: {{ comm_res.stdout }} bytes"
       verbosity: "{{ verbosity }}"
 
   - name: ({{ notes }}) update offset for next round
     set_fact:
       io_offset: >
-        {%- set offset = io_offset | default(0) + comm_res.stdout | int  -%}
-        {%- set end_of_range = device_size * active_range / 100 | int - 1 -%}
-        {%- if offset > end_of_range -%}
-          {%- set offset = offset - end_of_range - 1 -%}
+        {%- set offset_num = float(io_offset | default(0)) + float(comm_res.stdout) -%}
+        {%- set end_of_range = float(device_size) * active_range / 100 - 1 -%}
+        {%- if offset_num > end_of_range -%}
+          {%- set offset_num = offset_num - end_of_range - 1 -%}
         {%- endif -%}
-        {{ offset }}
+        {{ offset_num | int }}
     when: not steady_state
 
   when: not steady_state

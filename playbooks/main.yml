@@ -93,7 +93,7 @@
         command: blockdev --getsize64 {{ device_node_name }}
         register: comm_res
       - set_fact:
-          device_size: "{{ comm_res.stdout | int }}"
+          device_size: "{{ comm_res.stdout }}"
       tags: [ 'always' ]
       when: test_device
   roles:
