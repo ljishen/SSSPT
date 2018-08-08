@@ -3,6 +3,8 @@
 
 - set_fact:
     job_key_path: .jobs[0].{{ 'read' if rwmixread == 100 else 'write' }}
+    io_offset: 0
+    throughputs_values: []
     steady_state: False
 
 - include_tasks: do_until_steady_state.yml

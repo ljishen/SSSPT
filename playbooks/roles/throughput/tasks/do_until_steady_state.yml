@@ -4,7 +4,7 @@
   - name: ({{ notes }}) run workload dependent pre-conditioning on {{ device_node_name }}
     become: yes
     command: >
-      {{ fio_dir }}/fio {{ pre_conditioning_job_filename }} --offset={{ io_offset | default(0) }}
+      {{ fio_dir }}/fio {{ pre_conditioning_job_filename }} --offset={{ io_offset }}
       --output-format={{ output_format }}
       --output {{ output_file }}
     args:
@@ -22,7 +22,7 @@
     set_fact:
       # convert from KB/s to MB/s before adding to the list
       throughputs_values: >
-        {{ throughputs_values | default([]) + [ comm_res.stdout | float / 1024 ] }}
+        {{ throughputs_values + [ comm_res.stdout | float / 1024 ] }}
 
   - debug:
       msg: "current throughput values (MB/s): {{ throughputs_values }}"
@@ -50,7 +50,7 @@
   - name: ({{ notes }}) update offset for next round
     set_fact:
       io_offset: >
-        {% set offset_num = io_offset | default(0) | int + comm_res.stdout | int -%}
+        {% set offset_num = io_offset | int + comm_res.stdout | int -%}
         {% set size_of_range = (device_size | int * active_range / 100) | int -%}
         {% if offset_num >= size_of_range -%}
           {% set offset_num = offset_num - size_of_range -%}
