@@ -62,7 +62,7 @@
   hosts: all
   tags: [ 'always' ]
   vars:
-    output_dir: "{{ inventory_dir }}/analysis/output_{{ role_path | basename }}"
+    output_dir: "{{ inventory_dir }}/analysis/data/output_{{ role_path | basename }}"
     output_format: json+
     output_file_suffix: json
     pre_conditioning_job_filename: pre-conditioning.fio
