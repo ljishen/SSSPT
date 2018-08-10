@@ -8,7 +8,6 @@
   include_tasks: loop_block_sizes.yml
   vars:
     notes: "bs {{ block_size }}"
-    output_file: "{{ output_dir }}/wipc_bs{{ block_size }}.{{ output_file_suffix }}"
   with_items:
     - 128kB
     - 1024kB

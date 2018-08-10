@@ -83,10 +83,16 @@
       register: comm_res
     - set_fact:
         device_size: "{{ comm_res.stdout }}"
+    - name: check and kill remnant pre-conditioning process
+      become: yes
+      shell: pkill -KILL -u "$(id -u)" -f 'fio\s+{{ pre_conditioning_job_filename }}'
+      ignore_errors: yes
   roles:
     - role: throughput
       vars:
         thread_count: 1
         queue_depth: 32
+      when: role_path | basename in run_perf_tests
+    - role: iops
       when: role_path | basename in run_perf_tests
 ...

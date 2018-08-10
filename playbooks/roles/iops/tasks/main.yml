@@ -1,0 +1,6 @@
+---
+- name: ensure the presence of output dir {{ output_dir }}
+  file:
+    path: "{{ output_dir }}"
+    state: directory
+...
