@@ -25,5 +25,5 @@ direct_io: 1
 # and 75% for Client Performance Test Specification (PTS-C).
 active_range: 75
 
-# Use the latest x number of values to detect steady state.
+# Use the last x number of values to detect steady state.
 measurement_window_size: 5

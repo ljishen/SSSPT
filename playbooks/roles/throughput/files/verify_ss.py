@@ -7,7 +7,7 @@ Definition of Steady State:
 
 Steady State: A device is said to be in Steady State when, for the dependent
 variable (y) being tracked:
-    a) Range(y) is less than 20% of Ave(y): Max(y)-Min(y) within the
+    a) Range(y) is less than 10% of Ave(y): Max(y)-Min(y) within the
        Measurement Window is no more than 20% of the Ave(y) within the
        Measurement Window; and
     b) Slope(y) is less than 10%: Max(y)-Min(y), where Max(y) and Min(y) are
@@ -15,15 +15,15 @@ variable (y) being tracked:
        y-values within the Measurement Window, is within 10% of Ave(y) value
        within the Measurement Window.
 
-Note that the length of measurement window is 5 according to the specific
-performance test in the PTS (e.g. Throughput Test on page 37).
+Note that the length of measurement window is 5 according to the PTS
+(e.g. Throughput Test on page 37).
 
 
 Usage:
     verify_ss.py LIST WINDOW_SIZE
 
 LIST        the values in list
-WINDOW_SIZE the number of latest values in LIST used for steady state detection
+WINDOW_SIZE the number of last values in LIST used for steady state detection
 
 """
 
@@ -33,12 +33,15 @@ import ast
 import numpy as np
 
 
+EXCURSION_THRESHOLD = 0.1
+
+
 def main():
     """Perform verification.
 
     Exit status:
         1: Do not satisfy the criteria of steady state.
-        0: Satisfy the criteria of steady state.
+        0: The input values satisfy the criteria of steady state.
 
     """
     values = ast.literal_eval(sys.argv[1])
@@ -53,15 +56,24 @@ def main():
     print("values in window:", values_in_window)
 
     avg_val = np.mean(values_in_window)
-    if max(values_in_window) - min(values_in_window) > avg_val * 0.2:
+    excursion_up = avg_val * (1 + EXCURSION_THRESHOLD)
+    excursion_down = avg_val * (1 - EXCURSION_THRESHOLD)
+
+    if max(values_in_window) > excursion_up:
+        exit(1)
+    if min(values_in_window) < excursion_down:
         exit(1)
 
-    coefficients = np.polyfit(
-        range(measurement_window_size),
-        values_in_window,
-        1)
+    # get rounds for the corresponding values in window; round starts from 1.
+    rounds = range(len(values) - measurement_window_size + 1, len(values) + 1)
+
+    coefficients = np.polyfit(rounds, values_in_window, 1)
     poly = np.poly1d(coefficients)
-    if abs(poly(0) - poly(measurement_window_size - 1)) > avg_val * 0.1:
+    poly_vals = poly([rounds[0], rounds[measurement_window_size - 1]])
+
+    if max(poly_vals) > excursion_up:
+        exit(1)
+    if min(poly_vals) < excursion_down:
         exit(1)
 
     exit(0)
