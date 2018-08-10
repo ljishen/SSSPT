@@ -1,0 +1,10 @@
+---
+- name: run common tests
+  include_tasks: loop_tests.yml
+  vars:
+    notes: "{{ cur_test }}"
+    output_dir_suffix: "{{ cur_test }}"
+  with_items: "{{ run_common_perf_tests }}"
+  loop_control:
+    loop_var: cur_test
+...

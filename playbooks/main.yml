@@ -62,18 +62,33 @@
   hosts: all
   tags: [ 'always' ]
   vars:
-    output_dir: "{{ inventory_dir }}/analysis/data/output_{{ role_path | basename }}"
+    output_dir_suffix: "{{ role_path | basename }}"
+    output_dir: "{{ inventory_dir }}/analysis/data/output_{{ output_dir_suffix }}"
     output_format: json+
     output_file_suffix: json
     pre_conditioning_job_filename: pre-conditioning.fio
   pre_tasks:
+    - command: ls {{ playbook_dir }}/roles/common/vars
+      register: comm_res
+    - name: get common performance tests
+      set_fact:
+        common_perf_tests: "{{ comm_res.stdout_lines }}"
+    - name: get all available performance tests
+      set_fact:
+        available_perf_tests:
+          "{{ role_names | difference(['common']) | union(common_perf_tests) }}"
     - set_fact:
-        run_perf_tests: "{{ ansible_run_tags | intersect(role_names) }}"
+        run_perf_tests: "{{ ansible_run_tags | intersect(available_perf_tests) }}"
     - debug:
-        msg: Please specify at least one of performance tests {{ role_names }} using '--tags'
+        msg: >
+          Please specify at least one of performance tests
+          {{ available_perf_tests }} using '--tags'
       when: run_perf_tests | length == 0
       failed_when: run_perf_tests | length == 0
 
+    - name: load global variables for performance test specification
+      include_vars:
+        file: "{{ test_spec }}.yml"
     - name: update write caching
       become: yes
       command: hdparm -W{{ write_caching }} {{ device_node_name }}
@@ -88,11 +103,8 @@
       shell: pkill -KILL -u "$(id -u)" -f 'fio\s+{{ pre_conditioning_job_filename }}'
       ignore_errors: yes
   roles:
-    - role: throughput
+    - role: common
       vars:
-        thread_count: 1
-        queue_depth: 32
-      when: role_path | basename in run_perf_tests
-    - role: iops
-      when: role_path | basename in run_perf_tests
+        run_common_perf_tests: "{{ common_perf_tests | intersect(run_perf_tests) }}"
+      when: run_common_perf_tests | length > 0
 ...

@@ -1,0 +1,23 @@
+---
+- name: ({{ notes }}) ensure the presence of output dir {{ output_dir }}
+  file:
+    path: "{{ output_dir }}"
+    state: directory
+
+- name: ({{ notes }}) load common test variables
+  include_vars:
+    depth: 1
+    dir: "{{ cur_test }}"
+
+- set_fact:
+    outer_notes_test: "{{ notes }}"
+
+- include_tasks: loop_block_sizes.yml
+  vars:
+    notes: "{{ outer_notes_test }}, bs {{ block_size }}"
+  with_items:
+    - 128kB
+    - 1024kB
+  loop_control:
+    loop_var: block_size
+...

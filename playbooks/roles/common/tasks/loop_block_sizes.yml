@@ -1,7 +1,11 @@
 ---
+# save the outer notes.
+- set_fact:
+    outer_notes_block_sizes: "{{ notes }}"
+
 - include_tasks: loop_rw_mix.yml
   vars:
-    notes: "bs {{ block_size }}, %read {{ rwmixread }}"
+    notes: "{{ outer_notes_block_sizes }}, %read {{ rwmixread }}"
     output_file: "{{ output_dir }}/wipc_bs{{ block_size }}_read{{ rwmixread }}.{{ output_file_suffix }}"
   with_items:
     - 100

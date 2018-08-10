@@ -1,0 +1,9 @@
+---
+# This option specifies WCD (0) for Enterprise SSDs or
+# WCE (1) for Client SSDs in the PTS.
+write_caching: 0
+
+# This option corresponds to the concept of Active Range in the PTS.
+# Usually set 100% for Enterprise Performance Test Specification (PTS-E),
+# and 75% for Client Performance Test Specification (PTS-C).
+active_range: 100
