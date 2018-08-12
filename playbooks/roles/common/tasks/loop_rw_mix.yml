@@ -30,7 +30,7 @@
 - include_tasks: ss_reset.yml
 
 - set_fact:
-    value_key_prefix: .jobs[0].{{ key_prefix_in_job }}
+    value_key_prefix: jobs[0].{{ key_prefix_in_job }}.
     tracking_values: []
     steady_state: False
     outer_notes_rw_mix: "{{ notes }}"

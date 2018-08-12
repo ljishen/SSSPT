@@ -17,21 +17,13 @@
     args:
       chdir: "{{ workdir }}"
 
-  - name: ({{ notes }}) get throughput in kbytes per second
-    # See the difference between bw and bw_mean
-    # http://maillist.kernel.dk/fio-devel/0054.html
-    shell: cat {{ output_file }} | {{ workdir }}/jq '{{ value_key_prefix }}.bw'
-    register: comm_res
-
-  - debug:
-      msg: "throughput: {{ comm_res.stdout }} KB/s"
-      verbosity: "{{ verbosity }}"
-
   - name: ({{ notes }}) save throughput for steady state detection
     set_fact:
-      # convert from KB/s to MB/s before adding to the list
+      # Convert from KB/s to MB/s before adding to the list
+      # See the difference between bw and bw_mean
+      # http://maillist.kernel.dk/fio-devel/0054.html
       tracking_values: >
-        {{ tracking_values + [ comm_res.stdout | float / 1024 ] }}
+        {{ tracking_values + [ lookup('file', output_file) | from_json | json_query(value_key_prefix + 'bw') / 1024 ] }}
 
   - debug:
       msg: "current throughput values (MB/s): {{ tracking_values }}"
@@ -47,19 +39,10 @@
     set_fact:
       steady_state: "{{ True if comm_res.rc == 0 else False }}"
 
-  - name: ({{ notes }}) get total performed IO in bytes
-    shell: cat {{ output_file }} | {{ workdir }}/jq '{{ value_key_prefix }}.io_bytes'
-    register: comm_res
-    when: not steady_state
-
-  - debug:
-      msg: "total IO performed: {{ comm_res.stdout }} bytes"
-      verbosity: "{{ verbosity }}"
-
   - name: ({{ notes }}) update offset for next round
     set_fact:
       io_offset: >
-        {% set offset_num = io_offset | int + comm_res.stdout | int -%}
+        {% set offset_num = io_offset | int + lookup('file', output_file) | from_json | json_query(value_key_prefix + 'io_bytes') -%}
         {% set size_of_range = (device_size | int * active_range / 100) | int -%}
         {% if offset_num >= size_of_range -%}
           {% set offset_num = offset_num - size_of_range -%}
