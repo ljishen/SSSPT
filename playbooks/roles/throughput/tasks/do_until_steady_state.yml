@@ -17,8 +17,10 @@
     args:
       chdir: "{{ workdir }}"
 
-  - name: ({{ notes }}) get throughput in kbytes
-    shell: cat {{ output_file }} | {{ workdir }}/jq '{{ value_key_prefix }}.bw_mean'
+  - name: ({{ notes }}) get throughput in kbytes per second
+    # See the difference between bw and bw_mean
+    # http://maillist.kernel.dk/fio-devel/0054.html
+    shell: cat {{ output_file }} | {{ workdir }}/jq '{{ value_key_prefix }}.bw'
     register: comm_res
 
   - debug:
