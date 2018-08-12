@@ -1,5 +1,0 @@
----
-- set_fact:
-    key_prefix_in_job: "{{ 'read' if cur_rwmixread == 100 else 'write' }}"
-    io_offset: 0
-...
