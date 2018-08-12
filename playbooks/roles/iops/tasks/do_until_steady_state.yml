@@ -1,0 +1,45 @@
+---
+- block:
+
+  - name: ({{ notes }}) backup old output file
+    copy:
+      backup: yes
+      content: ""
+      dest: "{{ output_file }}"
+      force: yes
+
+  - name: ({{ notes }}) run workload dependent pre-conditioning on {{ device_node_name }}
+    become: yes
+    command: >
+      {{ fio_dir }}/fio {{ pre_conditioning_job_filename }}
+      --output-format={{ output_format }}
+      --output {{ output_file }}
+    args:
+      chdir: "{{ workdir }}"
+
+  - name: ({{ notes }}) save average IOPS for steady state detection
+    set_fact:
+      tracking_values: >
+        {%- set value_key_prefix = 'jobs[0].[read, write][].' -%}
+        {% set sum_iops = lookup('file', output_file) |
+                             from_json |
+                             json_query(value_key_prefix + 'total_ios') |
+                             sum -%}
+        {% set sum_runtime = lookup('file', output_file) |
+                               from_json |
+                               json_query(value_key_prefix + 'runtime') |
+                               sum / 1000 -%}
+        {{ tracking_values + [ sum_iops / sum_runtime ] }}
+
+  - name: ({{ notes }}) check steady state
+    command: >
+      {{ role_path }}/files/verify_ss.py '{{ tracking_values }}' {{ measurement_window_size }}
+    register: comm_res
+    ignore_errors: yes
+
+  - name: ({{ notes }}) update loop condition
+    set_fact:
+      steady_state: "{{ True if comm_res.rc == 0 else False }}"
+
+  when: not steady_state
+...

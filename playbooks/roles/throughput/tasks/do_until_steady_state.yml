@@ -26,11 +26,8 @@
       # See the difference between bw and bw_mean
       # http://maillist.kernel.dk/fio-devel/0054.html
       tracking_values: >
-        {{ tracking_values + [ lookup('file', output_file) | from_json | json_query(value_key_prefix + 'bw') / 1024 ] }}
-
-  - debug:
-      msg: "current throughput values (MB/s): {{ tracking_values }}"
-      verbosity: "{{ verbosity }}"
+        {%- set bw_num = lookup('file', output_file) | from_json | json_query(value_key_prefix + 'bw') / 1024 -%}
+        {{ tracking_values + [ bw_num ] }}
 
   - name: ({{ notes }}) check steady state
     command: >
@@ -44,7 +41,8 @@
         {%- if comm_res.rc == 0 or cur_round == maximum_rounds -%}
           0
         {% else -%}
-          {% set offset_num = io_offset | default(0) | int + lookup('file', output_file) | from_json | json_query(value_key_prefix + 'io_bytes') -%}
+          {% set offset_incr = lookup('file', output_file) | from_json | json_query(value_key_prefix + 'io_bytes') -%}
+          {% set offset_num = io_offset | default(0) | int + offset_incr -%}
           {% set size_of_range = (device_size | int * active_range / 100) | int -%}
           {% if offset_num >= size_of_range -%}
             {% set offset_num = offset_num - size_of_range -%}
