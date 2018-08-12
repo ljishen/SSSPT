@@ -21,6 +21,6 @@ measurement_window_size: 5
 
 # This option specifies which specification the tests should run with.
 # The only available options are:
-#   - PST-C: Client Performance Test Specification
-#   - PST-E: Enterprise Performance Test Specification
-test_spec: PST-C
+#   - PTS-C: Client Performance Test Specification
+#   - PTS-E: Enterprise Performance Test Specification
+test_spec: PTS-C

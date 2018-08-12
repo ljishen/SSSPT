@@ -5,11 +5,9 @@
 
 - include_tasks: loop_rw_mix.yml
   vars:
-    notes: "{{ outer_notes_block_sizes }}, %read {{ rwmixread }}"
-    output_file: "{{ output_dir }}/wipc_bs{{ block_size }}_read{{ rwmixread }}.{{ output_file_suffix }}"
-  with_items:
-    - 100
-    - 0
+    notes: "{{ outer_notes_block_sizes }}, %read {{ cur_rwmixread }}"
+    output_file: "{{ output_dir }}/wipc_bs{{ cur_block_size }}_read{{ cur_rwmixread }}.{{ output_file_suffix }}"
+  with_items: "{{ rwmixreads }}"
   loop_control:
-    loop_var: rwmixread
+    loop_var: cur_rwmixread
 ...

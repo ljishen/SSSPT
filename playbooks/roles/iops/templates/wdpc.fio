@@ -1,5 +1,5 @@
 name=wdpc
-rwmixread={{ rwmixread }}
+rwmixread={{ cur_rwmixread }}
 time_based=1
 
 ; run for 1 minute

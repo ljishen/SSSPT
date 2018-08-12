@@ -58,31 +58,21 @@
         chdir: "{{ fio_dir }}"
         creates: "{{ fio_dir }}/fio"
 
-- name: run performance test
+- name: run performance tests
   hosts: all
   tags: [ 'always' ]
   vars:
-    output_dir_suffix: "{{ role_path | basename }}"
-    output_dir: "{{ inventory_dir }}/analysis/data/output_{{ output_dir_suffix }}"
+    output_dir: "{{ inventory_dir }}/analysis/data/output_{{ role_path | basename }}"
     output_format: json+
     output_file_suffix: json
     pre_conditioning_job_filename: pre-conditioning.fio
   pre_tasks:
-    - command: ls {{ playbook_dir }}/roles/common/vars
-      register: comm_res
-    - name: get common performance tests
-      set_fact:
-        common_perf_tests: "{{ comm_res.stdout_lines }}"
-    - name: get all available performance tests
-      set_fact:
-        available_perf_tests:
-          "{{ role_names | difference(['common']) | union(common_perf_tests) }}"
     - set_fact:
-        run_perf_tests: "{{ ansible_run_tags | intersect(available_perf_tests) }}"
+        run_perf_tests: "{{ ansible_run_tags | intersect(role_names) }}"
     - debug:
         msg: >
           Please specify at least one of performance tests
-          {{ available_perf_tests }} using '--tags'
+          {{ role_names }} using '--tags'
       when: run_perf_tests | length == 0
       failed_when: run_perf_tests | length == 0
 
@@ -103,8 +93,8 @@
       shell: pkill -KILL -u "$(id -u)" -f 'fio\s+{{ pre_conditioning_job_filename }}'
       ignore_errors: yes
   roles:
-    - role: common
-      vars:
-        run_common_perf_tests: "{{ common_perf_tests | intersect(run_perf_tests) }}"
-      when: run_common_perf_tests | length > 0
+    - role: throughput
+      when: role_path | basename in run_perf_tests
+    - role: iops
+      when: role_path | basename in run_perf_tests
 ...

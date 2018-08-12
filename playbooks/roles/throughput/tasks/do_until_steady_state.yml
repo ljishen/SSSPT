@@ -18,7 +18,7 @@
       chdir: "{{ workdir }}"
 
   - name: ({{ notes }}) get throughput in kbytes
-    shell: cat {{ output_file }} | {{ workdir }}/jq '{{ job_key_path }}.bw_mean'
+    shell: cat {{ output_file }} | {{ workdir }}/jq '{{ value_key_prefix }}.bw_mean'
     register: comm_res
 
   - debug:
@@ -28,16 +28,16 @@
   - name: ({{ notes }}) save throughput for steady state detection
     set_fact:
       # convert from KB/s to MB/s before adding to the list
-      throughputs_values: >
-        {{ throughputs_values + [ comm_res.stdout | float / 1024 ] }}
+      tracking_values: >
+        {{ tracking_values + [ comm_res.stdout | float / 1024 ] }}
 
   - debug:
-      msg: "current throughput values (MB/s): {{ throughputs_values }}"
+      msg: "current throughput values (MB/s): {{ tracking_values }}"
       verbosity: "{{ verbosity }}"
 
   - name: ({{ notes }}) check steady state
     command: >
-      {{ role_path }}/files/verify_ss.py '{{ throughputs_values }}' {{ measurement_window_size }}
+      {{ role_path }}/files/verify_ss.py '{{ tracking_values }}' {{ measurement_window_size }}
     register: comm_res
     ignore_errors: yes
 
@@ -46,7 +46,7 @@
       steady_state: "{{ True if comm_res.rc == 0 else False }}"
 
   - name: ({{ notes }}) get total performed IO in bytes
-    shell: cat {{ output_file }} | {{ workdir }}/jq '{{ job_key_path }}.io_bytes'
+    shell: cat {{ output_file }} | {{ workdir }}/jq '{{ value_key_prefix }}.io_bytes'
     register: comm_res
     when: not steady_state
 
