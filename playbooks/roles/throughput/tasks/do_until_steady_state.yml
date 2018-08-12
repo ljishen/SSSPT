@@ -41,7 +41,7 @@
   - name: ({{ notes }}) update offset for next round
     set_fact:
       io_offset: >
-        {%- if comm_res.rc == 0 -%}
+        {%- if comm_res.rc == 0 or cur_round == maximum_rounds -%}
           0
         {% else -%}
           {% set offset_num = io_offset | default(0) | int + lookup('file', output_file) | from_json | json_query(value_key_prefix + 'io_bytes') -%}

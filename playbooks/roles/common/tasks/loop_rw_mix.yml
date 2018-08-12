@@ -36,7 +36,7 @@
   vars:
     notes: "{{ outer_notes_rw_mix }}, round {{ cur_round }}"
     output_file: "{{ output_dir }}/wdpc_bs{{ cur_block_size }}_read{{ cur_rwmixread }}_round{{ cur_round }}.{{ output_file_suffix }}"
-  with_sequence: count=25
+  with_sequence: count={{ maximum_rounds }}
   loop_control:
     loop_var: cur_round
 
