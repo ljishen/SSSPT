@@ -1,8 +1,8 @@
 ---
 # See SSS PTS v2.0.1 on page 27
 # https://www.snia.org/sites/default/files/technical_work/PTS/SSS_PTS_2.0.1.pdf
-wipc_block_size: 128KiB
+wipc_block_size: 128KB
 wdpc_io_pattern: randrw
 
-block_sizes: ['1024KiB', '128KiB', '64KiB', '32KiB', '16KiB', '8KiB', '4KiB', '0.5KiB']
+block_sizes: ['1024KB', '128KB', '64KB', '32KB', '16KB', '8KB', '4KB', '0.5KB']
 rwmixreads: [100, 95, 65, 50, 35, 5, 0]

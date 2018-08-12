@@ -7,5 +7,5 @@ queue_depth: 32
 wipc_block_size: "{{ cur_block_size }}"
 wdpc_io_pattern: readwrite
 
-block_sizes: ['128KiB', '1024KiB']
+block_sizes: ['128KB', '1024KB']
 rwmixreads: [100, 0]
