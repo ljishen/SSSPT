@@ -22,11 +22,10 @@
       tracking_values: >
         {%- set sum_iops = lookup('file', output_file) |
                              from_json |
-                             json_query('jobs[0].[read, write][].total_ios') |
-                             sum -%}
+                             json_query('sum(jobs[0].[read, write][].total_ios)') -%}
         {% set runtime = lookup('file', output_file) |
                                from_json |
-                               json_query('jobs[0].read.runtime') / 1000 -%}
+                               json_query('jobs[0].[read, write][?runtime!=`0`].runtime | [0]') / 1000 -%}
         {{ tracking_values + [ sum_iops / runtime ] }}
 
   - name: ({{ notes }}) check steady state
