@@ -1,29 +1,22 @@
 ---
 - block:
 
-  - name: ({{ notes }}) backup old output file
-    copy:
-      backup: yes
-      content: ""
-      dest: "{{ output_file }}"
-      force: yes
-
   - name: ({{ notes }}) run workload dependent pre-conditioning on {{ device_node_name }}
     become: yes
     command: >
-      {{ fio_dir }}/fio {{ pre_conditioning_job_filename }}
+      {{ fio_dir }}/fio {{ pre_conditioning_job_file }}
       --output-format={{ output_format }}
-      --output {{ output_file }}
-    args:
-      chdir: "{{ workdir }}"
+      --output {{ remote_output_file }}
+
+  - include_tasks: backup_output_file.yml
 
   - name: ({{ notes }}) save average IOPS for steady state detection
     set_fact:
       tracking_values: >
-        {%- set sum_iops = lookup('file', output_file) |
+        {%- set sum_iops = lookup('file', remote_output_file) |
                              from_json |
                              json_query('sum(jobs[0].[read, write][].total_ios)') -%}
-        {% set runtime = lookup('file', output_file) |
+        {% set runtime = lookup('file', remote_output_file) |
                                from_json |
                                json_query('jobs[0].[read, write][?runtime!=`0`].runtime | [0]') / 1000 -%}
         {{ tracking_values + [ sum_iops / runtime ] }}

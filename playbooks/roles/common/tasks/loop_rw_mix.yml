@@ -5,21 +5,14 @@
     io_pattern: write
     block_size: "{{ wipc_block_size }}"
 
-- name: ({{ notes }}) backup old output file
-  copy:
-    backup: yes
-    content: ""
-    dest: "{{ output_file }}"
-    force: yes
-
 - name: ({{ notes }}) run workload independent pre-conditioning on {{ device_node_name }}
   become: yes
   command: >
-    {{ fio_dir }}/fio {{ pre_conditioning_job_filename }}
+    {{ fio_dir }}/fio {{ pre_conditioning_job_file }}
     --output-format={{ output_format }}
-    --output {{ output_file }}
-  args:
-    chdir: "{{ workdir }}"
+    --output {{ remote_output_file }}
+
+- include_tasks: backup_output_file.yml
 
 - include_tasks: tmp_job_files.yml
   vars:
@@ -35,7 +28,9 @@
 - include_tasks: do_until_steady_state.yml
   vars:
     notes: "{{ outer_notes_rw_mix }}, round {{ cur_round }}"
-    output_file: "{{ output_dir }}/wdpc_bs{{ cur_block_size }}_read{{ cur_rwmixread }}_round{{ cur_round }}.{{ output_file_suffix }}"
+    output_filename: "wdpc_bs{{ cur_block_size }}_read{{ cur_rwmixread }}_round{{ cur_round }}.{{ output_file_suffix }}"
+    remote_output_file: "{{ remote_output_dir }}/{{ output_filename }}"
+    local_output_file: "{{ local_output_dir }}/{{ output_filename }}"
   with_sequence: count={{ maximum_rounds }}
   loop_control:
     loop_var: cur_round

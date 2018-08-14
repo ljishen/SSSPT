@@ -1,21 +1,14 @@
 ---
 - block:
 
-  - name: ({{ notes }}) backup old output file
-    copy:
-      backup: yes
-      content: ""
-      dest: "{{ output_file }}"
-      force: yes
-
   - name: ({{ notes }}) run workload dependent pre-conditioning on {{ device_node_name }}
     become: yes
     command: >
-      {{ fio_dir }}/fio {{ pre_conditioning_job_filename }} --offset={{ io_offset | default(0) }}
+      {{ fio_dir }}/fio {{ pre_conditioning_job_file }} --offset={{ io_offset | default(0) }}
       --output-format={{ output_format }}
-      --output {{ output_file }}
-    args:
-      chdir: "{{ workdir }}"
+      --output {{ remote_output_file }}
+
+  - include_tasks: backup_output_file.yml
 
   - set_fact:
       value_key_prefix: "jobs[0].{{ 'read' if cur_rwmixread == 100 else 'write' }}."
@@ -26,7 +19,7 @@
       # See the difference between bw and bw_mean
       # http://maillist.kernel.dk/fio-devel/0054.html
       tracking_values: >
-        {%- set bw_num = lookup('file', output_file) | from_json | json_query(value_key_prefix + 'bw') / 1024 -%}
+        {%- set bw_num = lookup('file', remote_output_file) | from_json | json_query(value_key_prefix + 'bw') / 1024 -%}
         {{ tracking_values + [ bw_num ] }}
 
   - name: ({{ notes }}) check steady state
@@ -41,7 +34,7 @@
         {%- if comm_res.rc == 0 or cur_round == maximum_rounds -%}
           0
         {% else -%}
-          {% set offset_incr = lookup('file', output_file) | from_json | json_query(value_key_prefix + 'io_bytes') -%}
+          {% set offset_incr = lookup('file', remote_output_file) | from_json | json_query(value_key_prefix + 'io_bytes') -%}
           {% set offset_num = io_offset | default(0) | int + offset_incr -%}
           {% set size_of_range = (device_size | int * active_range / 100) | int -%}
           {% if offset_num >= size_of_range -%}

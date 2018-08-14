@@ -1,0 +1,16 @@
+---
+- name: ({{ notes }}) backup old output file
+  local_action:
+    module: copy
+    backup: yes
+    content: ""
+    dest: "{{ local_output_file }}"
+    force: yes
+
+- name: ({{ notes }}) backup output file
+  fetch:
+    dest: "{{ local_output_dir }}/"
+    fail_on_missing: yes
+    flat: yes
+    src: "{{ remote_output_file }}"
+...

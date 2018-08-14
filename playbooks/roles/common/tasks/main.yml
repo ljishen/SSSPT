@@ -1,7 +1,13 @@
 ---
-- name: ensure the presence of output dir {{ output_dir }}
+- name: ensure the presence of remote output dir {{ remote_output_dir }}
   file:
-    path: "{{ output_dir }}"
+    path: "{{ remote_output_dir }}"
+    state: directory
+
+- name: ensure the presence of local output dir {{ local_output_dir }}
+  local_action:
+    module: file
+    path: "{{ local_output_dir }}"
     state: directory
 
 - name: load specific test variables

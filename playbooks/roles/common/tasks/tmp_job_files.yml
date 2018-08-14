@@ -1,15 +1,15 @@
 ---
-- name: ({{ notes }}) template the pre-conditioning job file to {{ workdir }}
+- name: ({{ notes }}) template the pre-conditioning job file to {{ remote_job_files_dir }}
   template:
     backup: yes
-    dest: "{{ workdir }}/{{ pre_conditioning_job_filename }}"
+    dest: "{{ pre_conditioning_job_file }}"
     force: yes
     src: "{{ pre_conditioning_job_filename }}"
 
-- name: ({{ notes }}) template the included job file to {{ workdir }}
+- name: ({{ notes }}) template the included job file to {{ remote_job_files_dir }}
   template:
     backup: yes
-    dest: "{{ workdir }}/{{ included_job_filename }}"
+    dest: "{{ remote_job_files_dir }}/{{ included_job_filename }}"
     force: yes
     src: "{{ included_job_filename }}"
 ...

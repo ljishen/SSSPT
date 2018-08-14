@@ -48,7 +48,7 @@
         remote_src: yes
         src: https://codeload.github.com/axboe/fio/tar.gz/fio-{{ fio_version }}
     - name: build fio-{{ fio_version }} from source
-      shell: ./configure && make
+      shell: ./configure && make -j2
       args:
         chdir: "{{ fio_dir }}"
         creates: "{{ fio_dir }}/fio"
@@ -57,10 +57,14 @@
   hosts: all
   tags: [ 'always' ]
   vars:
-    output_dir: "{{ inventory_dir }}/analysis/data/output_{{ role_path | basename }}"
+    remote_data_dir: "{{ workdir }}/data"
+    remote_job_files_dir: "{{ remote_data_dir }}/job_files"
+    remote_output_dir: "{{ remote_data_dir }}/output_{{ role_path | basename }}"
+    local_output_dir: "{{ inventory_dir }}/analysis/data/{{ inventory_hostname }}/output_{{ role_path | basename }}"
     output_format: json+
     output_file_suffix: json
     pre_conditioning_job_filename: pre-conditioning.fio
+    pre_conditioning_job_file: "{{ remote_job_files_dir }}/{{ pre_conditioning_job_filename }}"
   pre_tasks:
     - set_fact:
         run_perf_tests: "{{ ansible_run_tags | intersect(role_names) }}"
@@ -85,8 +89,12 @@
         device_size: "{{ comm_res.stdout }}"
     - name: check and kill remnant pre-conditioning process
       become: yes
-      shell: pkill -KILL -u "$(id -u)" -f 'fio\s+{{ pre_conditioning_job_filename }}'
+      shell: pkill -KILL -u "$(id -u)" -f 'fio\s+{{ pre_conditioning_job_file }}'
       ignore_errors: yes
+    - name: ensure the presence of job files dir {{ remote_job_files_dir }}
+      file:
+        path: "{{ remote_job_files_dir }}"
+        state: directory
   roles:
     - role: throughput
       when: role_path | basename in run_perf_tests
