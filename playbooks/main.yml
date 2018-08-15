@@ -22,7 +22,7 @@
   any_errors_fatal: true
   tags: [ 'always' ]
   tasks:
-    - name: install dependent apt packages
+    - name: install dependent apt packages (remote)
       become: yes
       apt:
         autoclean: yes
@@ -31,8 +31,18 @@
           - libaio-dev
           - build-essential
           - hdparm
+        state: present
+        update_cache: yes
+    - name: install dependent apt packages (local)
+      become: yes
+      run_once: yes
+      local_action:
+        module: apt
+        autoclean: yes
+        install_recommends: no
+        name:
           - python3-numpy
-          - python-jmespath  # this is required by json_query filter
+          - python3-jmespath  # this is required by json_query filter
         state: present
         update_cache: yes
     - name: ensure the presence of workdir {{ workdir }}
