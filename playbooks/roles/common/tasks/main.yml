@@ -18,6 +18,9 @@
 - include_tasks: loop_block_sizes.yml
   vars:
     notes: "bs {{ cur_block_size }}"
+    output_filename: "wipc_bs{{ cur_block_size }}.{{ output_file_suffix }}"
+    remote_output_file: "{{ remote_output_dir }}/{{ output_filename }}"
+    local_output_file: "{{ local_output_dir }}/{{ output_filename }}"
   with_items: "{{ block_sizes }}"
   loop_control:
     loop_var: cur_block_size
