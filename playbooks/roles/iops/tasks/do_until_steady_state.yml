@@ -22,7 +22,7 @@
         {{ tracking_values + [ sum_iops / runtime ] }}
 
   - name: ({{ notes }}) check steady state
-    command: >
+    script: >
       {{ role_path }}/files/verify_ss.py '{{ tracking_values }}' {{ measurement_window_size }}
     register: comm_res
     ignore_errors: yes
