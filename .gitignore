@@ -6,4 +6,5 @@
 output_*
 tmp
 
+__pycache__/
 .mypy_cache/
