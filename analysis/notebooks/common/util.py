@@ -7,8 +7,57 @@ import glob
 import operator
 import re
 
+import numpy as np
+
 
 FIG_DPI = 120
+
+_MEASUREMENT_WINDOW_SIZE = 5
+_EXCURSION_THRESHOLD = 0.1
+EXCURSION_UP = 1 + _EXCURSION_THRESHOLD
+EXCURSION_DOWN = 1 - _EXCURSION_THRESHOLD
+
+
+def get_values_in_window(values):
+    """Return all the values with in the measurement window."""
+    return values[-1 * _MEASUREMENT_WINDOW_SIZE:]
+
+
+def plot_measurement_window(axes, rounds, values):
+    """Plot the measurement window using the rounds and values."""
+    rounds_in_window = get_values_in_window(rounds)
+    values_in_window = get_values_in_window(values)
+
+    bars = []
+
+    # plot the line of raw values
+    bars.append(axes.errorbar(rounds, values, fmt='-D'))
+
+    # plot average lines
+    avg_value = np.mean(values_in_window)
+    times_to_shape = {1: '-s', EXCURSION_UP: '-^', EXCURSION_DOWN: '-v'}
+
+    for time, shape in times_to_shape.items():
+        bars.append(
+            axes.errorbar(
+                [rounds_in_window[0], rounds_in_window[-1]],
+                [avg_value * time] * 2,
+                fmt=shape)
+        )
+
+    # plot slope line
+    coefficients = np.polyfit(rounds_in_window, values_in_window, 1)
+    poly = np.poly1d(coefficients)
+    bars.append(
+        axes.errorbar(
+            rounds_in_window,
+            poly(rounds_in_window),
+            fmt='-.')
+    )
+
+    axes.grid(which='major', alpha=0.5)
+
+    return bars, rounds_in_window, values_in_window, avg_value, poly
 
 
 def get_profiles(profiles_dirname, block_size, rwmixread):
