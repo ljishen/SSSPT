@@ -4,7 +4,11 @@
 
 import json
 import glob
+import operator
 import re
+
+
+FIG_DPI = 120
 
 
 def get_profiles(profiles_dirname, block_size, rwmixread):
@@ -17,17 +21,19 @@ def get_profiles(profiles_dirname, block_size, rwmixread):
     """
     profile_name_pattern = \
         '/wdpc_bs{:s}_read{:d}_round[0-9]*.json'.format(block_size, rwmixread)
-    profiles = sorted(
-        glob.glob('../data/' + profiles_dirname + profile_name_pattern))
+    profiles = glob.glob('../data/' + profiles_dirname + profile_name_pattern)
 
     if not profiles:
         raise RuntimeError(
             'Cannot find any profiles with pattern %r' % profile_name_pattern)
 
-    rounds = list(
-        map(lambda s: int(re.search(r'round(\d+)', s).group(1)), profiles))
+    round_profile_pairs = []
+    for profile in profiles:
+        round_profile_pairs.append(
+            (int(re.search(r'round(\d+)', profile).group(1)),
+             profile))
 
-    return rounds, profiles
+    return sorted(round_profile_pairs, key=operator.itemgetter(0))
 
 
 def __get_job_obj(profile):
