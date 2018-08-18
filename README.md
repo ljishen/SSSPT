@@ -8,13 +8,13 @@ Ansible playbook that complies with Solid State Storage (SSS) Performance Test S
 ## Requirements on Control Machine
 
 - `ansible >= 2.5`
-<!---
+<!--
 need to install "jmespath" prior to running json_query filter
 https://github.com/elastic/ansible-elasticsearch/issues/321
 
 Flag python-jmespath as PPA dependency
 https://github.com/ansible/ansible/issues/24319
---->
+-->
 - `jmespath >= 0.9.3` (`apt-get install python-jmespath`)
 
 
