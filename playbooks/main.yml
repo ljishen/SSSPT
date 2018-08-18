@@ -42,7 +42,6 @@
         install_recommends: no
         name:
           - python3-numpy
-          - python3-jmespath  # this is required by json_query filter
         state: present
         update_cache: yes
     - name: ensure the presence of workdir {{ workdir }}
