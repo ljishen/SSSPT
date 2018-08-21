@@ -81,8 +81,8 @@ def plot_ss_convergence(profiles_dirname):
         loc=8,
         bbox_to_anchor=(0.5, 0.9),
         frameon=False,
-        ncol=2)
-    plt.suptitle('Steady State Convergence - SEQ R/W', y=1.05)
+        ncol=3)
+    plt.suptitle('Steady State Convergence - SEQ R/W', y=1.1)
     plt.show()
 
 
