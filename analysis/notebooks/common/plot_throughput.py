@@ -50,7 +50,7 @@ def __create_subplots():
 
 
 MODES = ['read', 'write']
-BLOCK_SIZES = ['128KB', '1024KB']
+BLOCK_SIZES = ['4KB', '8KB', '16KB', '32KB', '128KB', '1024KB']
 
 
 def plot_ss_convergence(profiles_dirname):
@@ -89,10 +89,13 @@ def plot_ss_convergence(profiles_dirname):
 def plot_ss_measurement_window(profiles_dirname):
     for mode in MODES:
         display(Markdown('---'))
-        _, axes = __create_subplots()
 
         for idx, bs in enumerate(BLOCK_SIZES):
-            ax = axes[idx]
+            ax_idx = idx % 2
+            if ax_idx == 0:
+                _, axes = __create_subplots()
+
+            ax = axes[ax_idx]
 
             rounds, values = __get_avg_bws(profiles_dirname, bs, mode)
 
@@ -144,34 +147,42 @@ def plot_ss_measurement_window(profiles_dirname):
                 formula=poly)
             display(HTML(verification_report))
 
-        plt.figlegend(
-            bars,
-            ['Throughputs', 'Average', '110% * Average', '90% * Average', 'Slope'],
-            loc=8,
-            bbox_to_anchor=(0.5, 0.9),
-            frameon=False,
-            ncol=3,
-            prop={'size': 9})
-        plt.suptitle(
-            'Steady State Measurement Window - SEQ ' + mode.capitalize(),
-            y=1.1)
-        plt.show()
+            if ax_idx == 1:
+                plt.figlegend(
+                    bars,
+                    ['Throughputs',
+                     'Average',
+                     '110% * Average',
+                     '90% * Average',
+                     'Slope'],
+                    loc=8,
+                    bbox_to_anchor=(0.5, 0.9),
+                    frameon=False,
+                    ncol=3,
+                    prop={'size': 9})
+                plt.suptitle(
+                    'Steady State Measurement Window - SEQ ' +
+                    mode.capitalize(),
+                    y=1.1)
+                plt.show()
 
 
 def plot_tp_measurement(profiles_dirname):
     display(Markdown('---'))
-    _, axes = __create_subplots()
-    for idx, bs in enumerate(BLOCK_SIZES):
-        ax = axes[idx]
 
-        bars = []
+    for idx, bs in enumerate(BLOCK_SIZES):
+        ax_idx = idx % 2
+        if ax_idx == 0:
+            _, axes = __create_subplots()
+
+        ax = axes[ax_idx]
 
         for mode in MODES:
             _, values = __get_avg_bws(profiles_dirname, bs, mode)
             values_in_window = util.get_values_in_window(values)
             avg_value = np.mean(values_in_window)
 
-            bars.append(ax.bar(mode, avg_value))
+            ax.bar(mode, avg_value)
             ax.text(
                 mode,
                 avg_value * 1.01,
@@ -182,4 +193,5 @@ def plot_tp_measurement(profiles_dirname):
 
         ax.set_ylabel('BS=' + bs + ' - Throughput (MB/s)')
 
-    plt.suptitle('Average Throughput - SEQ R/W')
+        if ax_idx == 1:
+            plt.suptitle('Average Throughput - SEQ R/W')
