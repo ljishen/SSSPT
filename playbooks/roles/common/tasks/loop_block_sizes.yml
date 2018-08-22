@@ -14,7 +14,7 @@
       --output {{ remote_output_file }}
 
   - include_tasks: backup_output_file.yml
-  when: run_wipc | default(yes)
+  when: run_wipc | default(True)
 
 - set_fact:
     run_wipc: "{{ not run_wipc_once }}"
