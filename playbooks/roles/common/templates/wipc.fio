@@ -1,2 +1,2 @@
 name=wipc
-io_size={{ device_size | int * 2 }}B
+io_size={{ (device_size | int * 2 / thread_count) | int }}B
