@@ -233,11 +233,10 @@ def plot_measurement_window_2d(profiles_dirname):
     bars = []
     for rwmixread in RWMIXREADS:
         avg_values = []
-        for bs in BLOCK_SIZES:
+        for bs in reversed(BLOCK_SIZES):
             _, values = __get_avg_iops(profiles_dirname, bs, rwmixread)
             avg_values.append(np.mean(util.get_values_in_window(values)))
 
-        avg_values.reverse()
         bars.append(ax.errorbar(xticks, avg_values, fmt='-o'))
 
     ax.set_xscale('log')
