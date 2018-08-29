@@ -14,7 +14,7 @@ These profiles are generated from Philip Kufeldt's RockPro64 board.
   </tr>
   <tr>
     <td><b>S/N</b></td>
-    <td>75AS1011T9HW</td>
+    <td>75AS1005T9HW</td>
   </tr>
   <tr>
     <td><b>Firmware Ver.</b></td>

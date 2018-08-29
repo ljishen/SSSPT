@@ -10,11 +10,11 @@ These profiles are generated from Philip Kufeldt's RockPro64 board.
   </tr>
   <tr>
     <td><b>Model No.</b></td>
-	<td>THNSNJ128G8NU</td>
+    <td>THNSNJ128G8NU</td>
   </tr>
   <tr>
     <td><b>S/N</b></td>
-	<td>75AS1011T9HW</td>
+    <td>75AS1011T9HW</td>
   </tr>
   <tr>
     <td><b>Firmware Ver.</b></td>
