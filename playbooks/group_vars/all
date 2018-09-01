@@ -15,7 +15,7 @@ measurement_window_size: 5
 
 # The default maximum number of iteration to evaluate the steady state for
 # each test.
-maximum_rounds: 25
+maximum_rounds: 100
 
 # This option specifies which specification the tests should run with.
 # The only available options are:
