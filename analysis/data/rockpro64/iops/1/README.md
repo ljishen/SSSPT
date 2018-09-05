@@ -1,5 +1,7 @@
 These profiles are generated from Jianshen Liu's RockPro64 board.
 
+This drive suffers from performance oscillation, so we discard the use of this drive.
+
 <table>
   <tr>
     <th colspan="2"><b>Device Under Test</b></th>
