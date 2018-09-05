@@ -14,11 +14,18 @@ direct_io: 1
 measurement_window_size: 5
 
 # The default maximum number of iteration to evaluate the steady state for
-# each test.
-maximum_rounds: 100
+# each test. For some volatile drive which is harder to get to the steady
+# state, this number can be set to a higher number, e.g. 100.
+maximum_rounds: 25
 
 # This option specifies which specification the tests should run with.
 # The only available options are:
 #   - PTS-C: Client Performance Test Specification
 #   - PTS-E: Enterprise Performance Test Specification
 test_spec: PTS-C
+
+# (DEBUG OPTION) Changing this option to True will interfere the behaviour of
+# `run_wipc_once` in the role vars. In this case, the workload independent
+# pre-conditioning (wipc) will totally be skipped if `run_wipc_once` was yes,
+# while it will only be skipped the first time if `run_wipc_once` was no.
+skip_first_wipc: False
