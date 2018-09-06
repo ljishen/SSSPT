@@ -1,0 +1,17 @@
+---
+# See SSS PTS v2.0.1 page 43
+# https://www.snia.org/sites/default/files/technical_work/PTS/SSS_PTS_2.0.1.pdf
+thread_count: 1
+queue_depth: 1
+
+# Run workload independent pre-conditioning only once per host.
+run_wipc_once: yes
+
+# Depending on the test, the block size could be 128KB or 1024KB
+# See SSS PTS v2.0.1 page 43
+wipc_block_size: 128KB
+
+wdpc_io_pattern: readwrite
+
+block_sizes: ['8KB', '4KB', '512B']
+rwmixreads: [100, 65, 0]

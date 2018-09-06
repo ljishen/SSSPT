@@ -1,5 +1,5 @@
 ---
-# See SSS PTS v2.0.1 on page 36
+# See SSS PTS v2.0.1 page 36
 # https://www.snia.org/sites/default/files/technical_work/PTS/SSS_PTS_2.0.1.pdf
 thread_count: 1
 queue_depth: 32

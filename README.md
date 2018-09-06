@@ -18,6 +18,15 @@ https://github.com/ansible/ansible/issues/24319
 - `jmespath >= 0.9.3` (`apt-get install python-jmespath`)
 
 
+## Supported Performance Tests
+
+- Throughput Test (page 36)
+- IOPS Test (page 27)
+- Latency Test (page 43)
+
+You can read the specific test flow on the instructed page above in [SSS PTS v2.0.1](https://www.snia.org/sites/default/files/technical_work/PTS/SSS_PTS_2.0.1.pdf)
+
+
 ## Usage
 
 ```bash
@@ -32,7 +41,7 @@ vim hosts
 # run tests
 ansible-playbook playbooks/main.yml --tags TESTS [-v]
 
-# TESTS can be any combinations of [throughput, iops] separated by comma.
+# TESTS can be any combinations of [throughput, iops, lat] separated by comma.
 # E.g. ansible-playbook playbooks/main.yml --tags "throughput,iops"
 #
 # Options:

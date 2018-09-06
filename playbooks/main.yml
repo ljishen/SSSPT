@@ -109,4 +109,6 @@
       when: role_path | basename in run_perf_tests
     - role: iops
       when: role_path | basename in run_perf_tests
+    - role: lat
+      when: role_path | basename in run_perf_tests
 ...
