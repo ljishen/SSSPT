@@ -1,0 +1,12 @@
+---
+- name: ({{ notes }}) save average IOPS for steady state detection
+  set_fact:
+    tracking_values: >
+      {%- set sum_iops = lookup('file', local_output_file) |
+                                from_json |
+                                json_query('sum(jobs[0].[read, write][].total_ios)') -%}
+      {% set runtime   = lookup('file', local_output_file) |
+                                from_json |
+                                json_query('jobs[0].[read, write][?runtime!=`0`].runtime | [0]') / 1000 -%}
+      {{ tracking_values + [ sum_iops / runtime ] }}
+...

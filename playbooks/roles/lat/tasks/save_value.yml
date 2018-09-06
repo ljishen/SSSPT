@@ -1,0 +1,13 @@
+---
+- name: ({{ notes }}) save average latency for steady state detection
+  set_fact:
+    tracking_values: >
+      {%- set total_ios   = lookup('file', local_output_file) |
+                                   from_json |
+                                   json_query('jobs[0].[read, write][].total_ios') -%}
+      {% set lat_ns_means = lookup('file', local_output_file) |
+                                   from_json |
+                                   json_query('jobs[0].[read, write][].lat_ns.mean') -%}
+      {{ tracking_values +
+        [ (lat_ns_means[0] * total_ios[0] + lat_ns_means[1] * total_ios[1]) / total_ios | sum ] }}
+...
