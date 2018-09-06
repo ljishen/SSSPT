@@ -1,4 +1,5 @@
 ---
+# the tracking values are in the unit of nanosecond.
 - name: ({{ notes }}) save average latency for steady state detection
   set_fact:
     tracking_values: >
