@@ -1,4 +1,4 @@
-These profiles are different from folder 1 that are generated on kernel release 4.4.132-0404132-generic.
+These profiles are generated on
 
 ```
 $ uname -a
@@ -15,11 +15,11 @@ Linux pl2 4.4.132-0404132-generic #201805211041 SMP Mon May 21 10:42:56 UTC 2018
   </tr>
   <tr>
     <td><b>Model No.</b></td>
-    <td>THNSNJ256G8NU</td>
+    <td>THNSNJ128G8NU</td>
   </tr>
   <tr>
     <td><b>S/N</b></td>
-    <td>15NS100WT9JW</td>
+    <td>75AS1011T9HW</td>
   </tr>
   <tr>
     <td><b>Firmware Ver.</b></td>
@@ -27,7 +27,7 @@ Linux pl2 4.4.132-0404132-generic #201805211041 SMP Mon May 21 10:42:56 UTC 2018
   </tr>
   <tr>
     <td><b>Capacity</b></td>
-    <td>256 GB</td>
+    <td>128 GB</td>
   </tr>
   <tr>
     <td><b>Interface</b></td>
