@@ -15,6 +15,9 @@
     dir: .
     files_matching: "{{ test_spec }}.yml"
 
+- set_fact:
+    run_wipc: "{{ not skip_first_wipc }}"
+
 - include_tasks: loop_block_sizes.yml
   vars:
     notes: "bs {{ cur_block_size }}"
