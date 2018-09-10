@@ -1,19 +1,19 @@
 ---
 - block:
-  - include_tasks: tmp_job_files.yml
-    vars:
-      included_job_filename: wipc.fio
-      io_pattern: write
-      block_size: "{{ wipc_block_size }}"
+    - include_tasks: tmp_job_files.yml
+      vars:
+        included_job_filename: wipc.fio
+        io_pattern: write
+        block_size: "{{ wipc_block_size }}"
 
-  - name: ({{ notes }}) run workload independent pre-conditioning on {{ device_node_name }}
-    become: yes
-    command: >
-      {{ fio_dir }}/fio {{ pre_conditioning_job_file }}
-      --output-format={{ output_format }}
-      --output {{ remote_output_file }}
+    - name: ({{ notes }}) run workload independent pre-conditioning on {{ device_node_name }}
+      become: yes
+      command: >
+        {{ fio_dir }}/fio {{ pre_conditioning_job_file }}
+        --output-format={{ output_format }}
+        --output {{ remote_output_file }}
 
-  - include_tasks: backup_output_file.yml
+    - include_tasks: backup_output_file.yml
   when: run_wipc
 
 - set_fact:
