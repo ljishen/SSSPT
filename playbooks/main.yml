@@ -90,16 +90,21 @@
     - name: update write caching
       become: yes
       command: hdparm -W{{ write_caching }} {{ device_node_name }}
+      register: comm_res
+      changed_when: "comm_res.rc == 0"
     - name: get size of {{ device_node_name }} in bytes
       become: yes
       command: blockdev --getsize64 {{ device_node_name }}
       register: comm_res
+      changed_when: False
     - set_fact:
         device_size: "{{ comm_res.stdout }}"
     - name: check and kill remnant pre-conditioning process
       become: yes
       shell: pkill -KILL -u "$(id -u)" -f 'fio\s+{{ pre_conditioning_job_file }}'
+      register: kill_res
       ignore_errors: yes
+      changed_when: "kill_res.rc == 0"
     - name: ensure the presence of job files dir {{ remote_job_files_dir }}
       file:
         path: "{{ remote_job_files_dir }}"
