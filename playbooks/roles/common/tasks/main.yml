@@ -1,6 +1,7 @@
 ---
 - name: ensure the presence of remote output dir {{ remote_output_dir }}
   file:
+    owner: "{{ ansible_user }}"
     path: "{{ remote_output_dir }}"
     state: directory
 

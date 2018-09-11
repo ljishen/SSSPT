@@ -46,6 +46,7 @@
         update_cache: yes
     - name: ensure the presence of workdir {{ workdir }}
       file:
+        owner: "{{ ansible_user }}"
         path: "{{ workdir }}"
         state: directory
     - set_fact:
@@ -107,6 +108,7 @@
       changed_when: "kill_res.rc == 0"
     - name: ensure the presence of job files dir {{ remote_job_files_dir }}
       file:
+        owner: "{{ ansible_user }}"
         path: "{{ remote_job_files_dir }}"
         state: directory
   roles:
