@@ -45,6 +45,7 @@
         state: present
         update_cache: yes
     - name: ensure the presence of workdir {{ workdir }}
+      become: yes
       file:
         owner: "{{ ansible_user }}"
         path: "{{ workdir }}"
@@ -107,6 +108,7 @@
       ignore_errors: yes
       changed_when: "kill_res.rc == 0"
     - name: ensure the presence of job files dir {{ remote_job_files_dir }}
+      become: yes
       file:
         owner: "{{ ansible_user }}"
         path: "{{ remote_job_files_dir }}"
