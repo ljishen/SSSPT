@@ -86,6 +86,17 @@
       when: run_perf_tests | length == 0
       failed_when: run_perf_tests | length == 0
 
+    - name: config scaling governor for online CPUs
+      become: yes
+      shell: |
+        for cpu_fd in /sys/devices/system/cpu/cpu[0-9]*/; do
+            online="$(cat "$cpu_fd"/online)"
+            if [ "$online" -eq 1 ]; then
+                echo '{{ cpu_scaling_governor }}' > "$cpu_fd"/cpufreq/scaling_governor
+            fi
+        done
+      register: cpu_config_res
+      changed_when: "cpu_config_res.rc == 0"
     - name: load global variables for performance test specification
       include_vars:
         file: "{{ test_spec }}.yml"

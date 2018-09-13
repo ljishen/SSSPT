@@ -5,10 +5,6 @@ ansible_ssh_private_key_file: /home/{{ ansible_user }}/keys/id_rsa
 workdir: /tmp/ssspt
 fio_version: 3.8
 
-# Optional prefix command for running the fio
-# One possible usage is to set the CPU affinity by using `taskset`
-fio_command_prefix: ''
-
 # This option sets whether to use non-buffered I/O, which
 # usually means O_DIRECT.
 # See http://fio.readthedocs.io/en/latest/fio_doc.html#cmdoption-arg-direct
@@ -28,8 +24,18 @@ maximum_rounds: 25
 #   - PTS-E: Enterprise Performance Test Specification
 test_spec: PTS-C
 
+
+#################### ADVANCED OPTIONS BELOW ####################
+
 # (DEBUG OPTION) Changing this option to True will interfere the behaviour of
 # `run_wipc_once` in the role vars. In this case, the workload independent
 # pre-conditioning (wipc) will totally be skipped if `run_wipc_once` was yes,
 # while it will only be skipped the first time if `run_wipc_once` was no.
 skip_first_wipc: False
+
+# Optional prefix command for running the fio
+# One possible usage is to set the CPU affinity by using `taskset -c`
+fio_command_prefix: ''
+
+# All online CPUs will be configured to use this scaling governor.
+cpu_scaling_governor: 'performance'
