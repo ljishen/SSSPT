@@ -4,7 +4,7 @@
     - name: ({{ notes }}) run workload dependent pre-conditioning on {{ device_node_name }}
       become: yes
       command: >
-        {{ fio_dir }}/fio {{ pre_conditioning_job_file }} --offset={{ io_offset | default(0) }}
+        {{ fio_command_prefix }} {{ fio_dir }}/fio {{ pre_conditioning_job_file }} --offset={{ io_offset | default(0) }}
         --output-format={{ output_format }}
         --output {{ remote_output_file }}
 
