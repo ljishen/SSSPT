@@ -210,3 +210,70 @@ def plot_measurement_window_tabular(profiles_dirname):
 
     display(Markdown('---'))
     display(HTML(tabular_data))
+
+
+def plot_lat_comp(profiles_dirnames):
+    ind = np.arange(len(RWMIXREADS))
+    width = (1 - 0.4) / len(profiles_dirnames)
+
+    for bs in BLOCK_SIZES:
+        fig, ax = plt.subplots()
+        fig.set_dpi(util.FIG_DPI)
+
+        avg_values = {}
+        std_values = {}
+
+        for plat, dirname in profiles_dirnames.items():
+            for rwmixread in RWMIXREADS:
+                _, values = __get_avg_lat(dirname, bs, rwmixread)
+                values_in_window = util.get_values_in_window(values)
+
+                if plat not in avg_values:
+                    avg_values[plat] = []
+
+                avg = np.mean(values_in_window)
+                avg_values[plat].append(avg)
+
+                if plat not in std_values:
+                    std_values[plat] = []
+                std_values[plat].append(np.std(values_in_window, ddof=1))
+
+        platforms = profiles_dirnames.keys()
+        bars = []
+        for idx, plat in enumerate(platforms):
+            bars.append(
+                ax.bar(ind + width * idx,
+                       avg_values[plat],
+                       width,
+                       yerr=std_values[plat]))
+
+        for idx_bs in ind:
+            for idx_plt, plat in enumerate(platforms):
+                ax.text(idx_bs + width * idx_plt,
+                        avg_values[plat][idx_bs] + 3000,
+                        '{:.1f}'.format(avg_values[plat][idx_bs]),
+                        fontsize=6,
+                        ha='center',
+                        va='bottom')
+
+        ax.yaxis.set_minor_locator(MultipleLocator(12500))
+        ax.grid(which='major', alpha=0.5)
+        ax.grid(which='minor', alpha=0.2)
+
+        ax.set_ylabel('Time (ns)')
+        ax.set_xlabel('R/W Mix %')
+
+        ax.set_xticks(ind + width / 2)
+        ax.set_xticklabels(
+            [__get_rwmix_read2write(rwmixread) for rwmixread in RWMIXREADS])
+
+        ax.legend(bars,
+                  platforms,
+                  loc=8,
+                  bbox_to_anchor=(0.5, 1),
+                  frameon=False,
+                  ncol=len(platforms),
+                  prop={'size': 9})
+
+        plt.title('Average Latency Comparison - ' + bs, y=1.1)
+        plt.show()

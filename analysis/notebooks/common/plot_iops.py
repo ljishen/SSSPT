@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import re
+import sys
 
 import numpy as np
 
@@ -9,6 +10,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 
 from IPython.display import display, Markdown, HTML
+from matplotlib.ticker import MultipleLocator
 from mpl_toolkits.mplot3d import Axes3D
 
 import util
@@ -326,3 +328,110 @@ def plot_measurement_window_3d(profiles_dirname):
 
     plt.tight_layout()
     plt.show()
+
+
+_DIR = 'dir'
+_MARKER = 'marker'
+
+
+def plot_iops_comp(profiles):
+    block_sizes_chunk_length = 4
+
+    for chunk_start in np.arange(0,
+                                 len(BLOCK_SIZES),
+                                 block_sizes_chunk_length):
+        chunk_end = min(chunk_start + block_sizes_chunk_length,
+                        len(BLOCK_SIZES))
+        _, ax = __create_subplots()
+
+        platforms = []
+        bars = []
+        block_sizes_in_chunk = \
+            list(reversed(BLOCK_SIZES))[chunk_start:chunk_end]
+        for plat, attrs in profiles.items():
+            platforms.append(plat)
+            dirname = attrs[_DIR]
+            for bs in block_sizes_in_chunk:
+                avg_values = []
+
+                for rwmixread in RWMIXREADS:
+                    _, values = __get_avg_iops(dirname, bs, rwmixread)
+                    avg_values.append(
+                        np.mean(util.get_values_in_window(values)))
+
+                bars.append(ax.errorbar(
+                    [__get_rwmix_read2write(rwmixread)
+                     for rwmixread in RWMIXREADS],
+                    avg_values,
+                    fmt=attrs[_MARKER]))
+
+            # reset the color cycle
+            # https://stackoverflow.com/a/24283087
+            ax.set_prop_cycle(None)
+
+        ax.yaxis.set_minor_locator(MultipleLocator(1000))
+        ax.grid(which='major', alpha=0.5)
+        ax.grid(which='minor', alpha=0.2)
+
+        ax.set_ylabel('IOPS')
+        ax.set_xlabel('R/W Mix %')
+
+        ax.add_artist(plt.legend(
+            bars[:len(block_sizes_in_chunk)],
+            block_sizes_in_chunk,
+            ncol=block_sizes_chunk_length,
+            loc=8,
+            bbox_to_anchor=(0.5, 1),
+            frameon=False))
+        plt.legend(bars[::block_sizes_chunk_length],
+                   platforms,
+                   prop={'size': 8})
+
+        plt.title('IOPS Comparison - ' + platforms[0] + ' vs. ' + platforms[1],
+                  y=1.12)
+        plt.show()
+
+
+def plot_diff_tabular(profiles):
+    rwmixread_tds = ''
+    for rwmixread in RWMIXREADS:
+        rwmixread_tds += '<td><b>{rwmixread}/{rwmixwrite}</b></td>'.format(
+            rwmixread=rwmixread,
+            rwmixwrite=(100 - rwmixread))
+
+    avg_iops_trs = ''
+    for bs in BLOCK_SIZES:
+        avg_iops_tds = '<td><b>{bs}</b></td>'.format(bs=bs)
+        for rwmixread in RWMIXREADS:
+            max_avg_val = -1
+            min_avg_val = sys.maxsize
+            for _, attrs in profiles.items():
+                dirname = attrs[_DIR]
+                _, values = __get_avg_iops(dirname, bs, rwmixread)
+                avg_value = np.mean(util.get_values_in_window(values))
+                max_avg_val = max(max_avg_val, avg_value)
+                min_avg_val = min(min_avg_val, avg_value)
+
+            avg_iops_tds += '<td>{diff_value:.2%}</td>'.format(
+                diff_value=(max_avg_val - min_avg_val) / min_avg_val)
+
+        avg_iops_trs += '<tr>' + avg_iops_tds + '</tr>'
+
+    tabular_data = '''\
+    <table>
+      <caption><b>IOPS Difference in %- ALL RW Mix & BS - Tabular Data</b></caption>
+      <tr>
+        <td rowspan="2"><b>Block Size</b></td>
+        <td colspan="{num_rwmixreads}"><b>Read / Write Mix %</b></td>
+      </tr>
+      <tr>
+        {rwmixread_tds}
+      </tr>
+      {avg_iops_trs}
+    </table>\
+    '''.format(
+        num_rwmixreads=len(RWMIXREADS),
+        rwmixread_tds=rwmixread_tds,
+        avg_iops_trs=avg_iops_trs)
+
+    display(HTML(tabular_data))
