@@ -1,4 +1,4 @@
-These profiles are generated from Jianshen Liu's RockPro64 board. These profiles are different from folder 6 that the testbed system only enables the 2 Cortex-A72 CPUs (@ 1.8) which are set to use the `performance` scaling governor. On the other hand, the fio process is pinned to `cpu5` using `taskset -c 5` as the fio command prefix.
+These profiles are generated from Jianshen Liu's RockPro64 board. These profiles are different from folder 1 that the testbed system only enables the 2 Cortex-A72 CPUs (@ 1.8) which are set to use the `performance` scaling governor. On the other hand, the fio process is pinned to `cpu5` using `taskset -c 5` as the fio command prefix.
 
 <table>
   <tr>

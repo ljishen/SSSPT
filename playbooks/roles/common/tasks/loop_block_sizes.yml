@@ -19,8 +19,7 @@
 - set_fact:
     run_wipc: "{{ not run_wipc_once }}"
 
-# save the outer notes.
-- set_fact:
+    # save the outer notes.
     outer_notes_block_sizes: "{{ notes }}"
 
 - include_tasks: loop_rw_mix.yml
