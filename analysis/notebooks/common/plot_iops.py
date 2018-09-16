@@ -399,27 +399,34 @@ def plot_diff_tabular(profiles):
             rwmixread=rwmixread,
             rwmixwrite=(100 - rwmixread))
 
+    platforms = list(profiles.keys())
     avg_iops_trs = ''
     for bs in BLOCK_SIZES:
         avg_iops_tds = '<td><b>{bs}</b></td>'.format(bs=bs)
         for rwmixread in RWMIXREADS:
-            max_avg_val = -1
-            min_avg_val = sys.maxsize
-            for _, attrs in profiles.items():
+            plat_avg_val = {}
+            for plat, attrs in profiles.items():
                 dirname = attrs[_DIR]
                 _, values = __get_avg_iops(dirname, bs, rwmixread)
                 avg_value = np.mean(util.get_values_in_window(values))
-                max_avg_val = max(max_avg_val, avg_value)
-                min_avg_val = min(min_avg_val, avg_value)
+                plat_avg_val[plat] = avg_value
 
-            avg_iops_tds += '<td>{diff_value:.2%}</td>'.format(
-                diff_value=(max_avg_val - min_avg_val) / min_avg_val)
+            comparator_sign = '<'
+            if plat_avg_val[platforms[0]] > plat_avg_val[platforms[1]]:
+                comparator_sign = '>'
+            plat_avg_val_max = max(plat_avg_val.values())
+            plat_avg_val_min = min(plat_avg_val.values())
+            avg_iops_tds += \
+                '<td align="center">{diff_value:.2%}<br>{sign}</td>'.format(
+                    diff_value=((plat_avg_val_max - plat_avg_val_min) /
+                                plat_avg_val_min),
+                    sign=comparator_sign)
 
         avg_iops_trs += '<tr>' + avg_iops_tds + '</tr>'
 
     tabular_data = '''\
     <table>
-      <caption><b>IOPS Difference in %- ALL RW Mix & BS - Tabular Data</b></caption>
+      <caption><b>IOPS Difference in %- ALL RW Mix & BS - {platforms} - Tabular Data</b></caption>
       <tr>
         <td rowspan="2"><b>Block Size</b></td>
         <td colspan="{num_rwmixreads}"><b>Read / Write Mix %</b></td>
@@ -430,6 +437,7 @@ def plot_diff_tabular(profiles):
       {avg_iops_trs}
     </table>\
     '''.format(
+        platforms=platforms[0] + ' vs. ' + platforms[1],
         num_rwmixreads=len(RWMIXREADS),
         rwmixread_tds=rwmixread_tds,
         avg_iops_trs=avg_iops_trs)
