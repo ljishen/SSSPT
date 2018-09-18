@@ -1,15 +1,16 @@
 ---
-- name: ({{ notes }}) backup old output file
+- name: ({{ notes }}) backup local output file
   local_action:
     module: copy
     backup: yes
     content: ""
     dest: "{{ local_output_file }}"
     force: yes
+    owner: "{{ lookup('env', 'USER') }}"
 
-- name: ({{ notes }}) backup output file
+- name: ({{ notes }}) fetch remote output file
   fetch:
-    dest: "{{ local_output_dir }}/"
+    dest: "{{ local_output_file }}"
     fail_on_missing: yes
     flat: yes
     src: "{{ remote_output_file }}"
