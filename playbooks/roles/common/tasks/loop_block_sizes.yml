@@ -25,7 +25,7 @@
 - include_tasks: loop_rw_mix.yml
   vars:
     notes: "{{ outer_notes_block_sizes }}, %read {{ cur_rwmixread }}"
-  with_items: "{{ rwmixreads }}"
+  loop: "{{ rwmixreads }}"
   loop_control:
     loop_var: cur_rwmixread
 ...
