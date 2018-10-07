@@ -7,5 +7,9 @@ run_wipc_once: yes
 wipc_bssplit: 128KB
 wdpc_io_pattern: randrw
 
+# You can define different block_size_splits following the fio command line option bssplit
+# https://fio.readthedocs.io/en/latest/fio_doc.html#cmdoption-arg-bssplit
+# e.g. block_size_splits: ['12KB/67:8KB/28:4KB/4:16KB,512KB/97:4KB']
 block_size_splits: ['1024KB', '128KB', '64KB', '32KB', '16KB', '8KB', '4KB', '512B']
+
 rwmixreads: [100, 95, 65, 50, 35, 5, 0]
