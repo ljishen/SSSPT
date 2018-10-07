@@ -4,8 +4,8 @@ run_wipc_once: yes
 
 # See SSS PTS v2.0.1 page 27
 # https://www.snia.org/sites/default/files/technical_work/PTS/SSS_PTS_2.0.1.pdf
-wipc_block_size: 128KB
+wipc_bssplit: 128KB
 wdpc_io_pattern: randrw
 
-block_sizes: ['1024KB', '128KB', '64KB', '32KB', '16KB', '8KB', '4KB', '512B']
+block_size_splits: ['1024KB', '128KB', '64KB', '32KB', '16KB', '8KB', '4KB', '512B']
 rwmixreads: [100, 95, 65, 50, 35, 5, 0]

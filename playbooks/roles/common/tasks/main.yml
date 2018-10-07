@@ -20,13 +20,13 @@
 - set_fact:
     run_wipc: "{{ not skip_first_wipc }}"
 
-- include_tasks: loop_block_sizes.yml
+- include_tasks: loop_block_size_splits.yml
   vars:
-    notes: "bs {{ cur_block_size }}"
-    output_filename: "wipc_bs{{ cur_block_size }}.{{ output_file_suffix }}"
+    notes: "bs {{ cur_bssplit }}"
+    output_filename: "wipc_bs{{ cur_bssplit | replace('/', '-') }}.{{ output_file_suffix }}"
     remote_output_file: "{{ remote_output_dir }}/{{ output_filename }}"
     local_output_file: "{{ local_output_dir }}/{{ output_filename }}"
-  loop: "{{ block_sizes }}"
+  loop: "{{ block_size_splits }}"
   loop_control:
-    loop_var: cur_block_size
+    loop_var: cur_bssplit
 ...

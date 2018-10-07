@@ -4,7 +4,7 @@
       vars:
         included_job_filename: wipc.fio
         io_pattern: write
-        block_size: "{{ wipc_block_size }}"
+        bssplit: "{{ wipc_bssplit }}"
 
     - name: ({{ notes }}) run workload independent pre-conditioning on {{ device_node_name }}
       become: yes

@@ -9,9 +9,9 @@ run_wipc_once: yes
 
 # Depending on the test, the block size could be 128KB or 1024KB
 # See SSS PTS v2.0.1 page 43
-wipc_block_size: 128KB
+wipc_bssplit: 128KB
 
 wdpc_io_pattern: readwrite
 
-block_sizes: ['8KB', '4KB', '512B']
+block_size_splits: ['8KB', '4KB', '512B']
 rwmixreads: [100, 65, 0]
