@@ -15,7 +15,7 @@ https://github.com/elastic/ansible-elasticsearch/issues/321
 Flag python-jmespath as PPA dependency
 https://github.com/ansible/ansible/issues/24319
 -->
-- `jmespath >= 0.9.3` (`apt-get install python-jmespath`)
+- `jmespath >= 0.9.3` (`apt-get install python-jmespath python3-jmespath`)
 
 
 ## Supported Performance Tests
