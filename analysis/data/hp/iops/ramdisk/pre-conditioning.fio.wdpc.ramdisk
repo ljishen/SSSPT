@@ -1,0 +1,12 @@
+[pc]
+ioengine=libaio
+group_reporting=1
+filename=/mnt/ramdisk/data
+direct=0
+rw=randrw
+bssplit=12KB/53:8KB/20:4KB/10:128KB,512KB/72:4KB/14:508KB
+numjobs=2
+iodepth=16
+size=30GB
+# include wdpc.fio.fixed_seed
+# include wdpc.fio.dynamic_seed
