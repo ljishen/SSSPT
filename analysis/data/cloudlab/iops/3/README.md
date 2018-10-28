@@ -1,6 +1,7 @@
 These profiles are generated under `c240g2` hardware type from `CloudLab`. The device under test is one of the Intel DC S3500 480 GB 6G SATA SSD.
 
 - bssplit '12KB/53:8KB/20:4KB/10:128KB,512KB/72:4KB/14:508KB' and rwmixread 87
+- each run last for 10 mins
 
 
 System information:
