@@ -1,5 +1,10 @@
 ---
 - block:
+    - name: ({{ notes }}) purge the device {{ device_node_name }}
+      become: yes
+      command: >
+        {{ role_path }}/files/blkerasediscard.sh {{ device_node_name }}
+
     - include_tasks: tmp_job_files.yml
       vars:
         included_job_filename: wipc.fio

@@ -4,7 +4,7 @@ set -eu -o pipefail
 
 if [ "$#" -ne 1 ]; then
     cat <<-ENDOFMESSAGE
-Usage: ./config_cpu.sh SCALING_GOVERNOR
+Usage: $0 SCALING_GOVERNOR
 
 Set the scaling governor specified by SCALING_GOVERNOR for all online CPUs.
 
