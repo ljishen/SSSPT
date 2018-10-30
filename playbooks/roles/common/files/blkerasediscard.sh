@@ -4,9 +4,9 @@ set -eu -o pipefail
 
 if [ "$#" -ne 1 ]; then
 	cat <<-ENDOFMESSAGE
-Usage: $0 DEVICE
+Usage: $0 BLOCK_DEVICE
 
-Secure erase and discard all the sectors on the drive.
+Secure erase and discard all the sectors on the block device.
 
 Note that this script is EXCEPTIONALLY DANGEROUS.
 See the option --trim-sector-ranges of hdparm.
@@ -69,8 +69,8 @@ while [ "$sectors" -gt 0 ]; do
 
     hdparm --please-destroy-my-drive --trim-sector-ranges "$pos":"$size" "$device" > /dev/null
 
-	sectors=$(( sectors - size ))
-	pos=$(( pos + size ))
+    sectors=$(( sectors - size ))
+    pos=$(( pos + size ))
 done
 
 echo "successfully trimmed all $total_sectors"
