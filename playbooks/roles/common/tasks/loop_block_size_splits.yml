@@ -21,6 +21,9 @@
     - include_tasks: backup_output_file.yml
   when: run_wipc
 
+- meta: end_play
+  when: run_wipc_only
+
 - set_fact:
     run_wipc: "{{ not run_wipc_once }}"
 

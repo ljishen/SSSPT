@@ -33,6 +33,10 @@ test_spec: PTS-C
 # while it will only be skipped the first time if `run_wipc_once` was no.
 skip_first_wipc: False
 
+# (DEBUG OPTION) Setting this option to True as well as skip_first_wipc to
+# False if you want to run workload independent pre-conditioning (wipc) only.
+run_wipc_only: False
+
 # Optional prefix command for running the fio
 # One possible usage is to set the CPU affinity by using `taskset -c`
 fio_command_prefix: ''
