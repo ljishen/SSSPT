@@ -1,4 +1,4 @@
-full trim + 75% seq fill, then 3x30min Fixed/Random LBAs runs
+full trim + ??% seq fill, then ?x30min Fixed/Random LBAs runs
 
 
 ```bash
