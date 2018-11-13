@@ -13,6 +13,8 @@ with open(sys.argv[1], 'r') as fp:
             if line.strip():
                 nums = line.split()
                 throughputs.append(float(nums[5]) + float(nums[6]))
+            else:
+                throughputs.append(0)
 
             data_in_nextline = False
             continue
