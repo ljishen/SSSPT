@@ -1,0 +1,29 @@
+name=wdpc
+
+randrepeat=0
+allrandrepeat=0
+norandommap
+
+# Use a completely uniform random distribution to perform random I/O.
+# random is the default option.
+random_distribution=random
+
+# SSS PTS requires the random function for generating random LBA #’s during
+# random I/O tests shall be have an output >= 48-bit.
+# The default engine for generating I/O offsets for random I/O in fio is
+# tausworthe, which has an output == 88-bit
+random_generator=tausworthe
+
+# Seed all random number generators in a predictable way so results are
+# repeatable across runs.
+# allrandrepeat=1
+
+# SSS PTS requires the random function shall be seedable so the I/O pattern is
+# repeatable across runs.
+# randseed=101
+
+rwmixread=87
+time_based=1
+
+; run for 1 minute
+runtime=1800s
