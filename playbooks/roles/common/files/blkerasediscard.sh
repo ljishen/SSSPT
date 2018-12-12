@@ -30,7 +30,7 @@ if [ ! -b "$device" ]; then
 fi
 
 total_sectors="$(blockdev --getsz "$device")"
-echo "total 512-byte $total_sectors on device $device"
+echo "total $total_sectors 512-byte sectors on device $device"
 
 MAXSECT=65535
 
