@@ -50,6 +50,6 @@ while [ "$sectors" -gt 0 ]; do
     pos=$(( pos + size ))
 done
 
-echo "successfully trimmed all $total_sectors"
+echo "successfully trimmed all $total_sectors sectors"
 
 printf "\\ndone!\\n"
