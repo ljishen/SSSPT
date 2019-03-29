@@ -1,6 +1,6 @@
 ---
 ansible_user: ljishen
-ansible_ssh_private_key_file: "{{ lookup('env','HOME') | dirname }}/{{ ansible_user }}/keys/id_rsa"
+ansible_ssh_private_key_file: /home/{{ lookup('env', 'USER') }}/keys/id_rsa
 
 workdir: /tmp/ssspt
 fio_version: 3.8
@@ -25,7 +25,7 @@ maximum_rounds: 25
 test_spec: PTS-C
 
 
-#################### ADVANCED OPTIONS BELOW ####################
+########################### Advanced Options ###########################
 
 # (DEBUG OPTION) Changing this option to True will interfere the behaviour of
 # `run_wipc_once` in the role vars. In this case, the workload independent
@@ -43,3 +43,23 @@ fio_command_prefix: ''
 
 # All online CPUs will be configured to use this scaling governor.
 cpu_scaling_governor: 'performance'
+
+
+######################### Internal Parameters #########################
+
+device_node_name: "/dev/{{ device_name }}"
+fio_dir: "{{ workdir }}/fio-fio-{{ fio_version }}"
+remote_data_dir: "{{ workdir }}/data"
+remote_job_files_dir: "{{ remote_data_dir }}/job_files"
+remote_output_dir: "{{ remote_data_dir }}/output_{{ role_path | basename }}"
+local_output_dir: "{{ inventory_dir }}/analysis/data/{{ inventory_hostname }}/output_{{ role_path | basename }}"
+output_format: json+
+output_file_suffix: json
+pre_conditioning_job_filename: pre-conditioning.fio
+pre_conditioning_job_file: "{{ remote_job_files_dir }}/{{ pre_conditioning_job_filename }}"
+
+remote_scripts_dir: "{{ workdir }}/scripts"
+discard_sectors_script_filename: discard_sectors.sh
+enable_cpufreq_governor_script_filename: enable_cpufreq_governor.sh
+verify_steady_state_script_filename: verify_steady_state.py
+...

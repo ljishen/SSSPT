@@ -5,7 +5,8 @@
     io_pattern: "{{ wdpc_io_pattern }}"
     bssplit: "{{ cur_bssplit }}"
 
-- set_fact:
+- name: update parameters
+  set_fact:
     tracking_values: []
     steady_state: False
     outer_notes_rw_mix: "{{ notes }}"

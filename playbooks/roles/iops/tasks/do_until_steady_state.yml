@@ -4,7 +4,8 @@
     - name: ({{ notes }}) run workload dependent pre-conditioning on {{ device_node_name }}
       become: yes
       command: >
-        {{ fio_command_prefix }} {{ fio_dir }}/fio {{ pre_conditioning_job_file }}
+        {{ fio_command_prefix }} {{ fio_dir }}/fio
+        {{ pre_conditioning_job_file }}
         --output-format={{ output_format }}
         --output {{ remote_output_file }}
 
@@ -13,8 +14,9 @@
     - include_tasks: save_value.yml
 
     - name: ({{ notes }}) check steady state
-      script: >
-        {{ role_path }}/files/verify_ss.py '{{ tracking_values }}' {{ measurement_window_size }}
+      command: >
+        {{ remote_scripts_dir }}/{{ verify_steady_state_script_filename }}
+        '{{ tracking_values }}' {{ measurement_window_size }}
       register: comm_res
       ignore_errors: yes
 

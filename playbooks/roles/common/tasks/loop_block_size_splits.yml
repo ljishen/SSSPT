@@ -1,9 +1,10 @@
 ---
 - block:
-    - name: ({{ notes }}) purge the device {{ device_node_name }}
+    - name: ({{ notes }}) discard sectors for device {{ device_node_name }}
       become: yes
       command: >
-        {{ role_path }}/files/blkerasediscard.sh {{ device_node_name }}
+        {{ remote_scripts_dir }}/{{ discard_sectors_script_filename }}
+        {{ device_node_name }}
 
     - include_tasks: tmp_job_files.yml
       vars:
@@ -24,7 +25,8 @@
 - meta: end_play
   when: run_wipc_only
 
-- set_fact:
+- name: update parameters
+  set_fact:
     run_wipc: "{{ not run_wipc_once }}"
 
     # save the outer notes.

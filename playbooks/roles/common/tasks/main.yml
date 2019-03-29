@@ -7,17 +7,18 @@
     state: directory
 
 - name: ensure the presence of local output dir {{ local_output_dir }}
-  local_action:
-    module: file
+  file:
     path: "{{ local_output_dir }}"
     state: directory
+  delegate_to: localhost
 
 - name: load specific test variables
   include_vars:
     dir: .
     files_matching: "{{ test_spec }}.yml"
 
-- set_fact:
+- name: update parameters
+  set_fact:
     run_wipc: "{{ not skip_first_wipc }}"
 
 - include_tasks: loop_block_size_splits.yml
